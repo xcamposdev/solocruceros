@@ -12,3 +12,9 @@ class crm_custom_hide(models.TransientModel):
         ('convert', 'Convert to opportunity'),
         # ('merge', 'Merge with existing opportunities')
     ], 'Conversion Action', required=True)
+
+    action = fields.Selection([
+        ('create', 'Create a new customer'),
+        ('exist', 'Link to an existing customer'),
+        ('nothing', 'Do not link to a customer')
+    ], 'Related Customer', required=True)
