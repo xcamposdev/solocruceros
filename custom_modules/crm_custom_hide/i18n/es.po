@@ -1,0 +1,130 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* crm_custom_hide
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0e+e-20200715\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-04 04:30+0000\n"
+"PO-Revision-Date: 2020-09-04 04:30+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: crm_custom_hide
+#: model_terms:ir.ui.view,arch_db:crm_custom_hide.view_crm_lead2opportunity_partner_custom
+msgid "Assign this opportunity to"
+msgstr "Asignar esta oportunidad a "
+
+#. module: crm_custom_hide
+#: model_terms:ir.ui.view,arch_db:crm_custom_hide.view_crm_lead2opportunity_partner_custom
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__name
+msgid "Conversion Action"
+msgstr "Acciones de conversión"
+
+#. module: crm_custom_hide
+#: model_terms:ir.ui.view,arch_db:crm_custom_hide.crm_lead_view_form_inherited
+#: model_terms:ir.ui.view,arch_db:crm_custom_hide.view_crm_lead2opportunity_partner_custom
+msgid "Convert to Opportunity"
+msgstr "Convertir en oportunidad"
+
+#. module: crm_custom_hide
+#: model:ir.actions.act_window,name:crm_custom_hide.action_crm_lead2opportunity_partner_custom
+#: model:ir.model.fields.selection,name:crm_custom_hide.selection__crm_lead2opportunity_partner_custom__name__convert
+msgid "Convert to opportunity"
+msgstr "Convertir a oportunidad"
+
+#. module: crm_custom_hide
+#: model_terms:ir.ui.view,arch_db:crm_custom_hide.view_crm_lead2opportunity_partner_custom
+msgid "Create Opportunity"
+msgstr "Crear oportunidad"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__create_date
+msgid "Created on"
+msgstr "Creado el"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__partner_id
+#: model_terms:ir.ui.view,arch_db:crm_custom_hide.view_crm_lead2opportunity_partner_custom
+msgid "Customer"
+msgstr "Cliente"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__display_name
+msgid "Display Name"
+msgstr "Nombre mostrado"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__id
+msgid "ID"
+msgstr ""
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom____last_update
+msgid "Last Modified on"
+msgstr "Última modificación en"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__write_uid
+msgid "Last Updated by"
+msgstr "Última actualización por"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__write_date
+msgid "Last Updated on"
+msgstr "Última actualización el"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__opportunity_ids
+#: model_terms:ir.ui.view,arch_db:crm_custom_hide.view_crm_lead2opportunity_partner_custom
+msgid "Opportunities"
+msgstr "Oportunidades"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__action
+msgid "Related Customer"
+msgstr "Cliente relacionado"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__team_id
+msgid "Sales Team"
+msgstr "Equipo de ventas"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields,field_description:crm_custom_hide.field_crm_lead2opportunity_partner_custom__user_id
+msgid "Salesperson"
+msgstr "Comercial"
+
+#. module: crm_custom_hide
+#: model:ir.model,name:crm_custom_hide.model_crm_lead2opportunity_partner_custom
+msgid "crm.lead2opportunity.partner.custom"
+msgstr ""
+
+#. module: crm_custom_hide
+#: model:ir.model.fields.selection,name:crm_custom_hide.selection__crm_lead2opportunity_partner_custom__action__create
+msgid "Create a new customer"
+msgstr "Crear un nuevo cliente"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields.selection,name:crm_custom_hide.selection__crm_lead2opportunity_partner_custom__action__nothing
+msgid "Do not link to a customer"
+msgstr "No enlazar a un cliente"
+
+#. module: crm_custom_hide
+#: model:ir.model.fields.selection,name:crm_custom_hide.selection__crm_lead2opportunity_partner_custom__action__exist
+msgid "Link to an existing customer"
+msgstr "Enlace a cliente existente"
