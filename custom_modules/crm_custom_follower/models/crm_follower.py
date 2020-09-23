@@ -13,7 +13,7 @@ class crm_custom_follower(models.Model):
         _followers = []
         if(vals['partner_id'] is not None and vals['partner_id'] != False and vals['partner_id'] != self.env.user.partner_id.id):
             _followers.append(vals['partner_id'])
-        if(vals['user_id'] is not None and vals['user_id'] != False and vals['user_id'] != self.env.user.id):
+        if(vals.get('user_id') is not None and vals['user_id'] != False and vals['user_id'] != self.env.user.id):
             user_partner_id = self.env['res.users'].search([('id','=',vals['user_id'])])
             _followers.append(user_partner_id.partner_id.id)
         
