@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Nuevo parametro que sirve para asignacion -->
+    <record id="x_agent_logged_in_key" model="ir.config_parameter">
+        <field name="key">x_agent_logged_in_key</field>
+        <field name="value">0</field>
+    </record>
+
+    <!-- Creacion de accion automatizada -->
+    <record id="agent_auto_assign" model="base.automation">
+        <field name="name">Auto Asignacion de iniciativas</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="active" eval="True"/>
+        <field name="trigger">on_create</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['crm.lead'].search([('id','=',record.id)]).Custom_Assign_Agent_logged()
+        </field>
+    </record>
+
+
+
+    <!-- Adicion de boton -->
+    <record id="view_form_crm_lead_custom_0" model="ir.ui.view">
+        <field name="name">crm.lead.custom.0</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <field name="stage_id" position="before">
+                <button name="desasignarse" string="Desasignarse" type="object" class="oe_highlight" attrs="{'invisible':[('type','=','lead')]}" />
+            </field>
+        </field>
+    </record>
+
+</odoo>
