@@ -8,7 +8,7 @@
 
     <t t-extend="ImportView.import_button">
       <t t-jquery="button.o_button_import" t-operation="after">
-        <t t-if="widget.modelName=='crm.lead' and widget.initialState.viewType!=null and widget.initialState.viewType=='kanban'">
+        <t t-if="widget != null and widget.modelName=='crm.lead' and widget.initialState.viewType!=null and widget.initialState.viewType=='kanban'">
           <button t-if="widget.modelName == 'crm.lead'" class="btn btn-primary oe_action_new_lead_button" type="button" accesskey="f">Nuevo Lead</button>
         </t>
       </t>
