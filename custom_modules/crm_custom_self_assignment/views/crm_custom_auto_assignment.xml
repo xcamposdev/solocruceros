@@ -28,7 +28,7 @@
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
             <field name="stage_id" position="before">
-                <button name="desasignarse" string="Desasignarse" type="object" class="oe_highlight" attrs="{'invisible':[('type','=','lead')]}" />
+                <button name="desasignarse" string="Desasignarse" type="object" class="oe_highlight" attrs="{'invisible':[('type','=','lead'),('user_id','=','user_in_session')]}" />
             </field>
         </field>
     </record>

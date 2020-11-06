@@ -7,14 +7,20 @@ class crm_custom_auto_assignment(models.Model):
 
     _inherit = 'crm.lead'
 
+    user_in_session = fields.Many2one('res.users','Usuario', default=lambda self: self._default_current_user_id())
+
+    @api.model
+    def _default_current_user_id(self):
+        return self.env.user.id
+
     def Custom_Assign_Agent_logged(self):
         # Get parameter
         agent_logged = self.env['ir.config_parameter'].get_param('x_agent_logged_in_key')
 
-        next_employee = self.env['hr.employee'].search(['&',('id','>', agent_logged),('last_check_out','=',False)], order="id asc", limit=1)
+        next_employee = self.env['hr.employee'].search(['&',('id','>', agent_logged),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
         if(next_employee.id == False):
             self.env['ir.config_parameter'].set_param('x_agent_logged_in_key', 0)
-            next_employee = self.env['hr.employee'].search(['&',('id','>', 0),('last_check_out','=',False)], order="id asc", limit=1)
+            next_employee = self.env['hr.employee'].search(['&',('id','>', 0),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
         
         if(next_employee.id != False):
             # select * From hr_attendance
@@ -32,6 +38,20 @@ class crm_custom_auto_assignment(models.Model):
 
             # update last asign
             self.env['ir.config_parameter'].set_param('x_agent_logged_in_key', next_employee.id)
+
+            # Notify to current user
+            next_employee.user_id.notify_info(message='My information message', sticky=True)
+            
+
+
+
+
+
+
+
+
+
+
 
     def action_apply(self):
         self.ensure_one()
@@ -105,7 +125,7 @@ class crm_custom_auto_assignment(models.Model):
 
     def assign_new_lead(self):
         self.user_id = self.env.user.id
-        res = self.convert_opportunity(self.partner_id, [], False)
+        res = self.convert_opportunity(self.partner_id.id, [], False)
         
         leads_to_allocate = self
         if self._context.get('no_force_assignation'):
