@@ -19,8 +19,6 @@
         </field>
     </record>
 
-
-
     <!-- Adicion de boton -->
     <record id="view_form_crm_lead_custom_0" model="ir.ui.view">
         <field name="name">crm.lead.custom.0</field>
@@ -28,7 +26,7 @@
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
             <field name="stage_id" position="before">
-                <button name="desasignarse" string="Desasignarse" type="object" class="oe_highlight" attrs="{'invisible':[('type','=','lead'),('user_id','=','user_in_session')]}" />
+                <button name="desasignarse" string="Desasignarse" type="object" class="oe_highlight" attrs="{'invisible':['|',('type','=','lead'),'&amp;', ('user_id','=','user_in_session')]}" />
             </field>
         </field>
     </record>

@@ -3,6 +3,7 @@ odoo.define("web_notify.WebClient", function(require) {
 
     var WebClient = require("web.WebClient");
     var session = require("web.session");
+    var Dialog = require('web.Dialog');
     require("bus.BusService");
 
     WebClient.include({
@@ -46,13 +47,26 @@ odoo.define("web_notify.WebClient", function(require) {
             });
         },
         on_message: function(message) {
-            return this.call("notification", "notify", {
+            /*return this.call("notification", "notify", {
                 type: message.type,
                 title: message.title,
                 message: message.message,
                 sticky: message.sticky,
                 className: message.className,
-            });
+
+                
+            }); */
+            var dialog = new Dialog(this, {
+                title: 'Información',
+                size: 'medium',
+                $content: ("<div style='font-size:14px;font-family:Helvetica, Arial, sans-serif;'>" + message.message + "</div>"),
+                buttons: [{
+                    text: ('Ok'),
+                    classes: "btn-primary",
+                    close: true
+                }],
+            }).open();
+
         },
     });
 });

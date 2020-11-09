@@ -17,10 +17,10 @@ class crm_custom_auto_assignment(models.Model):
         # Get parameter
         agent_logged = self.env['ir.config_parameter'].get_param('x_agent_logged_in_key')
 
-        next_employee = self.env['hr.employee'].search(['&',('id','>', agent_logged),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
+        next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', agent_logged),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
         if(next_employee.id == False):
             self.env['ir.config_parameter'].set_param('x_agent_logged_in_key', 0)
-            next_employee = self.env['hr.employee'].search(['&',('id','>', 0),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
+            next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', 0),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
         
         if(next_employee.id != False):
             # select * From hr_attendance
@@ -40,11 +40,7 @@ class crm_custom_auto_assignment(models.Model):
             self.env['ir.config_parameter'].set_param('x_agent_logged_in_key', next_employee.id)
 
             # Notify to current user
-            next_employee.user_id.notify_info(message='My information message', sticky=True)
-            
-
-
-
+            next_employee.user_id.notify_info(message='Se ha agregado una nueva notificacion y ha sido asignada a ti.', sticky=True)
 
 
 
@@ -111,33 +107,33 @@ class crm_custom_auto_assignment(models.Model):
         #wizard and would probably diserve to be refactored or at least
         #moved to a better place
         if action == 'each_exist_or_create':
-            partner_id = self.with_context(active_id=lead_id)._find_matching_partner()
+            partner_id = self.sudo().with_context(active_id=lead_id)._find_matching_partner()
             action = 'create'
         result = self.env['crm.lead'].browse(lead_id).handle_partner_assignation(action, partner_id)
         return result.get(lead_id)
 
     def get_crm_lead_last_to_assign(self):
-        lead_last = self.env['crm.lead'].search(['&',('id','>', 0),('type','=','lead')], order="id desc", limit=1)
+        lead_last = self.env['crm.lead'].sudo().search(['&',('id','>', 0),('type','=','lead')], order="id desc", limit=1)
         if(lead_last):
             return lead_last.id
         else:
             return 0
 
     def assign_new_lead(self):
-        self.user_id = self.env.user.id
-        res = self.convert_opportunity(self.partner_id.id, [], False)
+        self.sudo().user_id = self.env.user.id
+        res = self.sudo().convert_opportunity(self.partner_id.id, [], False)
         
         leads_to_allocate = self
-        if self._context.get('no_force_assignation'):
+        if self.sudo()._context.get('no_force_assignation'):
             leads_to_allocate = leads_to_allocate.filtered(lambda lead: not self.user_id)
-        if self.user_id:
+        if self.sudo().user_id:
             leads_to_allocate.allocate_salesman(self.user_id, team_id=self.team_id.id)
 
         return res
 
 
     def desasignarse(self):
-        for follower in self.message_follower_ids:
+        for follower in self.sudo().message_follower_ids:
             if(follower.partner_id == self.user_id.partner_id):
                 follower.unlink()
 
