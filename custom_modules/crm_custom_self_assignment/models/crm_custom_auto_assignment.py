@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 import warnings
+import logging
 from odoo import api, fields, models, exceptions, _
 from odoo.exceptions import AccessError, UserError, ValidationError
+
+_logger = logging.getLogger(__name__)
+
 
 class crm_custom_auto_assignment(models.Model):
 
@@ -25,9 +29,7 @@ class crm_custom_auto_assignment(models.Model):
         if(next_employee.id != False):
             # select * From hr_attendance
             # eliminar el comercial de seguidores
-            for follower in self.message_follower_ids:
-                if(follower.partner_id == self.user_id.partner_id):
-                    follower.unlink()
+
             
             # asignar comercial a seguidores
             #self.message_subscribe(next_employee.user_partner_id.ids, [])
@@ -35,6 +37,15 @@ class crm_custom_auto_assignment(models.Model):
             self.action = "exist" #'create','exist','nothing' 
             self.user_id = next_employee.user_id
             self.action_apply()
+            
+            for follower in self.sudo().message_follower_ids:
+                if(follower.partner_id != self.sudo().user_id.partner_id and self.partner_id != follower.partner_id):
+                    follower.unlink()
+
+            # assign new client follower
+            list_id = []
+            list_id.append(self.sudo().partner_id.id)            
+            self.message_subscribe(partner_ids=list_id)
 
             # update last asign
             self.env['ir.config_parameter'].set_param('x_agent_logged_in_key', next_employee.id)
