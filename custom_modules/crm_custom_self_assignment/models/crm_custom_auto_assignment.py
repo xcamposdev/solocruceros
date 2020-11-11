@@ -51,7 +51,7 @@ class crm_custom_auto_assignment(models.Model):
             self.env['ir.config_parameter'].set_param('x_agent_logged_in_key', next_employee.id)
 
             # Notify to current user
-            next_employee.user_id.notify_info(message='Se ha agregado una nueva notificacion y ha sido asignada a ti.', sticky=True)
+            next_employee.user_id.notify_info(message='Se ha agregado una nueva oportunidad y ha sido asignada a ti.', sticky=True)
 
 
 
