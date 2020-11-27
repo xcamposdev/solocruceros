@@ -19,11 +19,11 @@ class crm_custom_auto_assignment(models.Model):
 
     def Custom_Assign_Agent_logged(self):
         # Get parameter
-        agent_logged = self.env['ir.config_parameter'].get_param('x_agent_logged_in_key')
+        agent_logged = self.env['ir.config_parameter'].sudo().get_param('x_agent_logged_in_key')
 
         next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', agent_logged),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
         if(next_employee.id == False):
-            self.env['ir.config_parameter'].set_param('x_agent_logged_in_key', 0)
+            self.env['ir.config_parameter'].sudo().set_param('x_agent_logged_in_key', 0)
             next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', 0),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
         
         if(next_employee.id != False):
@@ -48,7 +48,7 @@ class crm_custom_auto_assignment(models.Model):
             self.message_subscribe(partner_ids=list_id)
 
             # update last asign
-            self.env['ir.config_parameter'].set_param('x_agent_logged_in_key', next_employee.id)
+            self.env['ir.config_parameter'].sudo().set_param('x_agent_logged_in_key', next_employee.id)
 
             # Notify to current user
             next_employee.user_id.notify_info(message='Se ha agregado una nueva oportunidad y ha sido asignada a ti.', sticky=True)
