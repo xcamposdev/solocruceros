@@ -12,6 +12,7 @@ class crm_custom_auto_assignment(models.Model):
     _inherit = 'crm.lead'
 
     user_in_session = fields.Many2one('res.users','Usuario', default=lambda self: self._default_current_user_id())
+    
 
     @api.model
     def _default_current_user_id(self):
@@ -21,10 +22,10 @@ class crm_custom_auto_assignment(models.Model):
         # Get parameter
         agent_logged = self.env['ir.config_parameter'].sudo().get_param('x_agent_logged_in_key')
 
-        next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', agent_logged),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
+        next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', agent_logged),('last_check_out','=',False),('last_check_in', '!=', False), ('x_oportunity_notification', '=', 'si')], order="id asc", limit=1)
         if(next_employee.id == False):
             self.env['ir.config_parameter'].sudo().set_param('x_agent_logged_in_key', 0)
-            next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', 0),('last_check_out','=',False),('last_check_in', '!=', False)], order="id asc", limit=1)
+            next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', 0),('last_check_out','=',False),('last_check_in', '!=', False), ('x_oportunity_notification', '=', 'si')], order="id asc", limit=1)
         
         if(next_employee.id != False):
             # select * From hr_attendance
@@ -53,12 +54,17 @@ class crm_custom_auto_assignment(models.Model):
             # Notify to current user
             next_employee.user_id.notify_info(message='Se ha agregado una nueva oportunidad y ha sido asignada a ti.', sticky=True)
 
+    def search(self, args, offset=0, limit=None, order=None, count=False):
+        if args:
+            if ['type', '=', 'opportunity'] in args:
+                stage_id = list(_arg[2] for _arg in args if _arg[0] == "stage_id" and len(_arg) == 3)
+                if(stage_id):
+                    stage = self.env['crm.stage'].search([('id','=',stage_id)])
+                    if(stage.name == 'Nuevo'):
+                        order = 'create_date desc'
 
-
-
-
-
-
+        res = self._search(args, offset=offset, limit=limit, order=order, count=count)
+        return res if count else self.browse(res)
 
     def action_apply(self):
         self.ensure_one()
@@ -152,3 +158,12 @@ class crm_custom_auto_assignment(models.Model):
             'user_id':False,
             'type':'lead'
         })
+
+class hr_employee_opportunity_custom(models.Model):
+
+    _inherit = 'hr.employee'
+
+    x_oportunity_notification = fields.Selection([
+        ('si','Si'),
+        ('no','No')
+        ], string = "Recibir Oportunidades", default='no') 

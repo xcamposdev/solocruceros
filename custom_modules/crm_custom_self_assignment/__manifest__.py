@@ -9,7 +9,7 @@
     'description': """
         - Auto-asigna cuando no hay agentes logados, y cuando hay agentes logados
         """,
-    'depends': ['base','crm'],
+    'depends': ['base','crm', 'hr'],
     'data': [
         'views/crm_custom_auto_assignment.xml',
         'views/assets.xml',
