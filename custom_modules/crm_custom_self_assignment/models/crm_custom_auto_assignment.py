@@ -61,7 +61,7 @@ class crm_custom_auto_assignment(models.Model):
                 if(stage_id):
                     stage = self.env['crm.stage'].search([('id','=',stage_id)])
                     if(stage.name == 'Nuevo'):
-                        order = 'create_date desc'
+                        order = 'date_open desc'
 
         res = self._search(args, offset=offset, limit=limit, order=order, count=count)
         return res if count else self.browse(res)
