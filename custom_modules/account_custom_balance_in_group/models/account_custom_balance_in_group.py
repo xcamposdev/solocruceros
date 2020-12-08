@@ -83,7 +83,8 @@ class account_custom_balance_in_group_0(models.Model):
                     if(exist_group):
                         exist_group[0]['price'] = exist_group[0]['price'] + res[account.id][0]
                     else:
-                        account_groups.append({ 'group_id': account.group_id.id, 'name': account.group_id.name, 'price': res[account.id][0] })
+                        group_name = account.group_id.name_get()[0]
+                        account_groups.append({ 'group_id': account.group_id.id, 'name': group_name[1], 'price': res[account.id][0] })
                         
                 for account_group in account_groups:
                     name = account_group['name']
@@ -97,6 +98,7 @@ class account_custom_balance_in_group_0(models.Model):
                         'columns': [{'name': account_group['price']}],
                         'caret_options': groupby == 'account_id' and 'account.account' or groupby,
                         'financial_group_line_id': line.id,
+                        'custom_group': True,
                     }
                     if line.financial_report_id.name == 'Aged Receivable':
                         vals['trust'] = self.env['res.partner'].browse([account_group['group_id']]).trust
@@ -120,8 +122,7 @@ class account_custom_balance_in_group_0(models.Model):
                     vals['columns'] = [line._format(v) for v in vals['columns']]
                 if not line.formulas:
                     vals['columns'] = [{'name': ''} for k in vals['columns']]
-            #'columns':[{'name': 9050.800000000001}]
-            #s':[{'name': '9.050,80 €', 'no_format_name': 9050.800000000001}]
+            
             if len(lines) == 1:
                 new_lines = line.children_ids._get_lines(financial_report, currency_table, options, linesDicts)
                 if new_lines and line.formulas:

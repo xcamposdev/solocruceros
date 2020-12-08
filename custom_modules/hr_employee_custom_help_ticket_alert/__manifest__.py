@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Agrupar cuentas en balance",
+    'name': "Alerta de ticket",
     'version': '1.0',
     'author': "Develoop Software",
     'category': 'Uncategorized',
-    'summary': 'Agrupar cuentas en listado de balance.',
+    'summary': 'Alerta de ticket no respondido.',
     'website': "https://www.develoop.net/",
     'description': """
-        - Agrupar cuentas en listado de balance
+        - Alerta a un agente de que tiene un ticket de ayuda sin cambiar de estado por 10 o mas dias
         """,
-    'depends': ['base','account_reports','account_accountant', 'account'],
+    'depends': ['base','helpdesk','hr_attendance', 'mail'],
     'data': [
-        'views/account_custom_balance_in_group.xml',
-        "static/src/xml/qweb.xml",
+        'views/hr_employee_custom_help_ticket_alert.xml',
     ],
     'demo': [],
     "images": ['static/description/icon.png'],
