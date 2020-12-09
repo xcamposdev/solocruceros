@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- definimos el email a enviar por defecto -->
+    <data noupdate="1">
+        <record id="x_email_solocruceros_reservas" model="ir.config_parameter">
+            <field name="key">x_email_solocruceros_reservas</field>
+            <field name="value">acastillo@develoop.net</field>
+            <!-- <field name="value">reservas@solocruceros.com</field> -->
+        </record>
+   
+        <!--Email template -->
+        <record id="email_template_ticket_alert" model="mail.template">
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="name">Alerta - Ticket sin cambios</field>
+            <field name="email_from">${(object.company_id.email |safe}</field>
+            <field name="email_to" >${object.user_id.email}</field>
+            <field name="subject">${object.name or 'n/a' }</field>
+            <field name="auto_delete" eval="True" />
+            <field name="body_html"><![CDATA[
+                <div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+                    <p>Hola,</p>
+                    <p>Un ticket considerado de mucha importancia no ha cambiado de etapa en varios dias.</p>
+                    <br />
+                    <p>Saludos cordiales.</p>
+                </div>
+            ]]></field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE xml>
+<odoo>
+
+    <template id="crm_custom_auto_button_render_js" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/crm_custom_self_assignment/static/src/js/crm_custom_auto_assignment.js"></script>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_line_caret_options" inherit_id="account_reports.line_caret_options">
+            <xpath expr="//li[2]" position="replace">
+                <!-- <div><t t-esc="line"></t></div>
+                <div><t t-esc="self"></t></div>
+                <t t-log="line"/>
+                <t t-debug=""/> -->
+                <t t-if="line['caret_options'] == 'account.account' and line.get('custom_group', False) == False">
+                    <a role="menuitem" tabindex="-1" t-att-data-id="line['id']" action="open_general_ledger" class="dropdown-item">General Ledger</a>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="custom_line_template" inherit_id="account_reports.line_template">
+            <xpath expr="//a[hasclass('js_account_reports_add_footnote')]" position="replace">
+                <t t-if="line.get('custom_group', False) == False">
+                    <a role="menuitem" tabindex="-1" t-att-data-id="line['id']" class="dropdown-item js_account_reports_add_footnote">Annotate</a>
+                </t>
+            </xpath>
+        </template>
+    </data>
+</odoo>
