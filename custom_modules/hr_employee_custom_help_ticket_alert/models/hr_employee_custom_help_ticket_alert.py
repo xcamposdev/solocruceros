@@ -16,24 +16,25 @@ class hr_employee_custom_help_ticket_alert(models.Model):
         if can_check_without_pin or entered_pin is not None and entered_pin == self.sudo().pin:
 
             #################################################
-            have_ticket = self.env['helpdesk.ticket'].sudo().search(['&',('user_id','=',self.env.user.id), ('active', '=', True)], order="id asc")
-            days = '0'
-            if(have_ticket):
-                today = datetime.today()
-                last_update_days = (today - have_ticket.date_last_stage_update).days
+            have_tickets = self.env['helpdesk.ticket'].sudo().search(['&',('user_id','=',self.env.user.id), ('active', '=', True)], order="id asc")
+            for have_ticket in have_tickets:
+                days = '0'
+                if(have_ticket):
+                    today = datetime.today()
+                    last_update_days = (today - have_ticket.date_last_stage_update).days
 
-                if (last_update_days >= 10 and last_update_days < 30 and have_ticket.x_is_sending_10 == False and self.env.user.attendance_state == 'checked_out'):
-                    #enviar email si tiene ticket  
-                    days = 10
-                    self.send_notification(have_ticket, days)
-                    # Enviar alert
-                    self.user_id.notify_info(message='Tienes un ticket que debe ser atendido de manera urgente.', sticky=True)
-                elif (last_update_days >= 30 and have_ticket.x_is_sending_30 == False and self.env.user.attendance_state == 'checked_out'):
-                    #enviar email si tiene ticket  
-                    days = 30
-                    self.send_notification(have_ticket, days)
-                    # Enviar Alert
-                    self.user_id.notify_info(message='Tienes un ticket que debe ser atendido de manera urgente.', sticky=True)
+                    if (last_update_days >= 10 and last_update_days < 30 and have_ticket.x_is_sending_10 == False and self.env.user.attendance_state == 'checked_out'):
+                        #enviar email si tiene ticket  
+                        days = 10
+                        self.send_notification(have_ticket, days)
+                        # Enviar alert
+                        self.user_id.notify_info(message='Tienes un ticket que debe ser atendido de manera urgente.', sticky=True)
+                    elif (last_update_days >= 30 and have_ticket.x_is_sending_30 == False and self.env.user.attendance_state == 'checked_out'):
+                        #enviar email si tiene ticket  
+                        days = 30
+                        self.send_notification(have_ticket, days)
+                        # Enviar Alert
+                        self.user_id.notify_info(message='Tienes un ticket que debe ser atendido de manera urgente.', sticky=True)
             ##############################################
 
             return self._attendance_action(next_action)
