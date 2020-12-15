@@ -83,9 +83,13 @@ class account_custom_balance_in_group_0(models.Model):
                     if(exist_group):
                         exist_group[0]['price'] = exist_group[0]['price'] + res[account.id][0]
                     else:
-                        group_name = account.group_id.name_get()[0]
-                        account_groups.append({ 'group_id': account.group_id.id, 'name': group_name[1], 'price': res[account.id][0] })
-                        
+                        group_name = account.group_id.name_get()
+                        if(group_name):
+                            group_name = group_name[0]
+                            account_groups.append({ 'group_id': account.group_id.id, 'name': group_name[1], 'price': res[account.id][0] })
+                        else:
+                            account_groups.append({ 'group_id': account.group_id.id, 'name': '', 'price': res[account.id][0] })
+
                 for account_group in account_groups:
                     name = account_group['name']
                     if not self.env.context.get('print_mode') or not self.env.context.get('no_format'):
