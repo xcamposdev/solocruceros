@@ -29,31 +29,31 @@
                         <t t-foreach="docs" t-as="o">
                             <tr>
                                 <td class="text-left">
-                                    <span class="small" t-field="o.name"></span>
+                                    <span class="small" t-field="o.x_invoice_number"></span>
                                 </td>
                                 <td class="text-left">
-                                    <span class="small" t-field="o.invoice_date"></span>
+                                    <span class="small" t-field="o.x_invoice_date"></span>
                                 </td>
                                 <td class="text-left">
-                                    <span class="small" t-field="o.partner_id"></span>
+                                    <span class="small" t-field="o.x_invoice_partner_id"></span>
                                 </td>
                                 <td class="text-left">
                                     <span class="small" t-field="o.x_invoice_dni_nif"></span>
                                 </td>
                                 <td class="text-left">
-                                    <span class="small" t-field="o.fiscal_position_id"></span>
+                                    <span class="small" t-field="o.x_invoice_fiscal_position_id"></span>
                                 </td>
                                 <td class="text-right">
-                                    <span class="text-nowrap small" t-field="o.amount_untaxed_signed"></span>
+                                    <span class="text-nowrap small" t-field="o.x_invoice_amount_untaxes"></span>
                                 </td>
                                 <td class="text-right">
-                                    <span class="text-nowrap small" t-field="o.x_invoice_taxes_percent"></span>
+                                    <span class="text-nowrap small" t-field="o.x_invoice_tax_ids"></span>
                                 </td>
                                 <td class="text-right">
                                     <span class="text-nowrap small" t-field="o.x_invoice_taxes_value"></span>
                                 </td>
                                 <td class="text-right">
-                                    <span class="text-nowrap small" t-field="o.amount_total"></span>
+                                    <span class="text-nowrap small" t-field="o.x_invoice_amount_total"></span>
                                 </td>
                             </tr>
                         </t>

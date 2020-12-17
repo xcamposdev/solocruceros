@@ -11,6 +11,7 @@
         """,
     'depends': ['base','account','sale'],
     'data': [
+        'security/ir.model.access.csv',
         'views/custom_report_list_iva.xml',
         'report/report_list_iva_print.xml',
         'report/list_iva_templates.xml',
