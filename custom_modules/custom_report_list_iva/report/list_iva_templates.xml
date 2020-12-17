@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="print_iva_report_pdf">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="row">
+                        <div class="col h2 text-center" style="margin-bottom:20px;">
+                            <span>Listado de IVA</span>
+                        </div>
+                    </div>
+
+                    <table class="table table-sm o_main_table" name="invoice_line_table">
+                    <thead>
+                        <tr>
+                            <th name="th_number_invoice" class="text-left"><span class="small o_bold">Número factura</span></th>
+                            <th name="th_date_invoice" class="text-left"><span class="small o_bold">Fecha factura</span></th>
+                            <th name="th_client_name" class="text-left"><span class="small o_bold">Razón social</span></th>
+                            <th name="th_nif" class="text-left"><span class="small o_bold">DNI/NIF</span></th>
+                            <th name="th_fiscal_position" class="text-left"><span class="small o_bold">Posición fiscal</span></th>
+                            <th name="th_tax_exclude" class="text-right"><span class="small o_bold">Impuesto no incluido</span></th>
+                            <th name="th_tax_percent" class="text-right"><span class="small o_bold">% Impuesto</span></th>
+                            <th name="th_total_tax" class="text-right"><span class="small o_bold">Total Impuesto</span></th>
+                            <th name="th_total_invoice" class="text-right"><span class="small o_bold">Total factura</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="list_iva_tbody">
+                        <t t-foreach="docs" t-as="o">
+                            <tr>
+                                <td class="text-left">
+                                    <span class="small" t-field="o.name"></span>
+                                </td>
+                                <td class="text-left">
+                                    <span class="small" t-field="o.invoice_date"></span>
+                                </td>
+                                <td class="text-left">
+                                    <span class="small" t-field="o.partner_id"></span>
+                                </td>
+                                <td class="text-left">
+                                    <span class="small" t-field="o.x_invoice_dni_nif"></span>
+                                </td>
+                                <td class="text-left">
+                                    <span class="small" t-field="o.fiscal_position_id"></span>
+                                </td>
+                                <td class="text-right">
+                                    <span class="text-nowrap small" t-field="o.amount_untaxed_signed"></span>
+                                </td>
+                                <td class="text-right">
+                                    <span class="text-nowrap small" t-field="o.x_invoice_taxes_percent"></span>
+                                </td>
+                                <td class="text-right">
+                                    <span class="text-nowrap small" t-field="o.x_invoice_taxes_value"></span>
+                                </td>
+                                <td class="text-right">
+                                    <span class="text-nowrap small" t-field="o.amount_total"></span>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                    </table>
+                </div>    
+            </t>
+        </t>
+    </template>
+
+</odoo>
