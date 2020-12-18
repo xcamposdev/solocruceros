@@ -3,22 +3,19 @@
     <data>
         <record id="iva_report_view_list" model="ir.ui.view">
             <field name="name">iva_report_list.view</field>
-            <field name="model">account.move</field>
+            <field name="model">report.list.iva.custom</field>
             <field eval="16" name="priority"/>
             <field name="arch" type="xml">
-                <tree>
-                    <field name="name" string="Número factura" />
-                    <field name="state" invisible="1"/> 
-                    <field name="invoice_date" string="Fecha factura" />
-                    <field name="partner_id" string="Razón social" />
-                    <!-- <field name="vat" model="res.partner" string="DNI/NIF" search="[('vat','=','partner_id.vat')]"/> -->
+                <tree create="false">
+                    <field name="x_invoice_number" />
+                    <field name="x_invoice_date" />
+                    <field name="x_invoice_partner_id" />
                     <field name="x_invoice_dni_nif" />
-                    <field name="fiscal_position_id" string="Posición fiscal" />
-                    <field name="amount_untaxed_signed" string="Impuesto no incluido" />
-                    <field name="x_invoice_taxes_percent" />
+                    <field name="x_invoice_fiscal_position_id" />
+                    <field name="x_invoice_amount_untaxes" />
+                    <field name="x_invoice_tax_ids" />
                     <field name="x_invoice_taxes_value" />
-                    <field name="amount_total" string="Total Factura" />
-                    <field name="x_calculate" invisible="1" />
+                    <field name="x_invoice_amount_total"  />
                 </tree>
             </field>
         </record>
@@ -26,7 +23,7 @@
         <record id="action_iva_report_list" model="ir.actions.act_window">
             <field name="name">Listado de IVA</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">account.move</field>
+            <field name="res_model">report.list.iva.custom</field>
             <field name="view_mode">tree</field>
         </record>
 

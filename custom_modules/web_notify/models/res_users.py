@@ -56,9 +56,9 @@ class ResUsers(models.Model):
         self, type_message=DEFAULT, message=DEFAULT_MESSAGE, title=None, sticky=False
     ):
         # pylint: disable=protected-access
-        if not self.env.user._is_admin() and any(
-            user.id != self.env.uid for user in self
-        ):
+        # if not self.env.user._is_admin() and any(
+        #     user.id != self.env.uid for user in self
+        if any(user.id != self.env.uid for user in self):
             raise exceptions.UserError(
                 _("Sending a notification to another user is forbidden.")
             )

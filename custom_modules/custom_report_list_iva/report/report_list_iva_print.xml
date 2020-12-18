@@ -1,7 +1,7 @@
 <odoo>
     <report id="print_iva_report"
         	string="Listado de IVA"
-        	model="account.move"
+        	model="report.list.iva.custom"
         	report_type="qweb-pdf"
         	name="custom_report_list_iva.print_iva_report_pdf"
         	file="custom_report_list_iva.print_iva_report_pdf"
