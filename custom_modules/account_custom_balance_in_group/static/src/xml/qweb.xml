@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <template id="custom_line_caret_options" inherit_id="account_reports.line_caret_options">
+        <!-- <template id="custom_line_caret_options" inherit_id="account_reports.line_caret_options">
             <xpath expr="//li[2]" position="replace">
-                <!-- <div><t t-esc="line"></t></div>
-                <div><t t-esc="self"></t></div>
-                <t t-log="line"/>
-                <t t-debug=""/> -->
                 <t t-if="line['caret_options'] == 'account.account' and line.get('custom_group', False) == False">
                     <a role="menuitem" tabindex="-1" t-att-data-id="line['id']" action="open_general_ledger" class="dropdown-item">General Ledger</a>
                 </t>
             </xpath>
-        </template>
+        </template> -->
 
-        <template id="custom_line_template" inherit_id="account_reports.line_template">
+        <!-- <template id="custom_line_template" inherit_id="account_reports.line_template">
             <xpath expr="//a[hasclass('js_account_reports_add_footnote')]" position="replace">
                 <t t-if="line.get('custom_group', False) == False">
                     <a role="menuitem" tabindex="-1" t-att-data-id="line['id']" class="dropdown-item js_account_reports_add_footnote">Annotate</a>
                 </t>
+            </xpath>
+        </template> -->
+
+
+        <template id="custom_search_template" inherit_id="account_reports.search_template_extra_options">
+            <xpath expr="//div[1]" position="inside">
+                <a role="menuitem" class="dropdown-item js_account_report_bool_filter" t-if="options.get('group_account_type') != None" title="group_account_type" data-filter="group_account_type">Extender Agrupado</a>
             </xpath>
         </template>
     </data>

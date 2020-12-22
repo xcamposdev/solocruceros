@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE xml>
+<odoo>
+
+    <template id="assets_account_custom_balance" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/account_custom_balance_in_group/static/src/js/account_renderview_custom.js"></script>
+        </xpath>
+    </template>
+
+</odoo>
