@@ -11,6 +11,7 @@
         """,
     'depends': ['im_livechat'],
     'data': [
+        'views/assets.xml',
         'views/im_livechat_template_custom.xml',
     ],
     'demo': [],

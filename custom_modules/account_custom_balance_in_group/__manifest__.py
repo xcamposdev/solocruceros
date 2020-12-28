@@ -12,6 +12,7 @@
     'depends': ['base','account_reports','account_accountant', 'account'],
     'data': [
         'views/account_custom_balance_in_group.xml',
+        'views/assets.xml',
         "static/src/xml/qweb.xml",
     ],
     'demo': [],

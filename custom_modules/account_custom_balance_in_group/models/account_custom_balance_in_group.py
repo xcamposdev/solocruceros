@@ -22,8 +22,6 @@ class account_custom_balance_in_group_0(models.Model):
 
         # build comparison table
         for line in self:
-            # if(line.id == 92):
-            #     test = ""
             res = []
             debit_credit = len(comparison_table) == 1
             domain_ids = {'line'}
@@ -76,37 +74,60 @@ class account_custom_balance_in_group_0(models.Model):
                 if line.groupby:
                     domain_ids = sorted(list(domain_ids), key=lambda k: line._get_gb_name(k))
                 
-                accounts = self.env['account.account'].search([('id','=',domain_ids)])
-                account_groups = []
-                for account in accounts:
-                    exist_group = list(filter(lambda f:f['group_id'] == account.group_id.id, account_groups))
-                    if(exist_group):
-                        exist_group[0]['price'] = exist_group[0]['price'] + res[account.id][0]
-                    else:
-                        group_name = account.group_id.name_get()
-                        if(group_name):
-                            group_name = group_name[0]
-                            account_groups.append({ 'group_id': account.group_id.id, 'name': group_name[1], 'price': res[account.id][0] })
+                ##############################################################################
+                if options.get('group_account_type', False) == True:
+                    accounts = self.env['account.account'].search([('id','=',domain_ids)])
+                    account_groups = []
+                    for account in accounts:
+                        exist_group = list(filter(lambda f:f['group_id'] == account.group_id.id, account_groups))
+                        if(exist_group):
+                            exist_group[0]['price'] = exist_group[0]['price'] + res[account.id][0]
                         else:
-                            account_groups.append({ 'group_id': account.group_id.id, 'name': '', 'price': res[account.id][0] })
+                            group_name = account.group_id.name_get()
+                            if(group_name):
+                                group_name = group_name[0]
+                                account_groups.append({ 'group_id': account.group_id.id, 'name': group_name[1], 'price': res[account.id][0] })
+                            else:
+                                account_groups.append({ 'group_id': account.group_id.id, 'name': '', 'price': res[account.id][0] })
 
-                for account_group in account_groups:
-                    name = account_group['name']
-                    if not self.env.context.get('print_mode') or not self.env.context.get('no_format'):
-                        name = name[:40] + '...' if name and len(name) >= 45 else name
-                    vals = {
-                        'id': account_group['group_id'],
-                        'name': name,
-                        'level': line.level,
-                        'parent_id': line.id,
-                        'columns': [{'name': account_group['price']}],
-                        'caret_options': groupby == 'account_id' and 'account.account' or groupby,
-                        'financial_group_line_id': line.id,
-                        'custom_group': True,
-                    }
-                    if line.financial_report_id.name == 'Aged Receivable':
-                        vals['trust'] = self.env['res.partner'].browse([account_group['group_id']]).trust
-                    lines.append(vals)
+                    for account_group in account_groups:
+                        name = account_group['name']
+                        if not self.env.context.get('print_mode') or not self.env.context.get('no_format'):
+                            name = name[:40] + '...' if name and len(name) >= 45 else name
+                        vals = {
+                            'id': account_group['group_id'],
+                            'name': name,
+                            'level': line.level,
+                            'parent_id': line.id,
+                            'columns': [{'name': account_group['price']}],
+                            'caret_options': groupby == 'account_id' and 'account.account' or groupby,
+                            'financial_group_line_id': line.id,
+                            'custom_group': True,
+                        }
+                        if line.financial_report_id.name == 'Aged Receivable':
+                            vals['trust'] = self.env['res.partner'].browse([account_group['group_id']]).trust
+                        lines.append(vals)
+                else:
+                    if line.groupby:
+                        domain_ids = sorted(list(domain_ids), key=lambda k: line._get_gb_name(k))
+                    for domain_id in domain_ids:
+                        name = line._get_gb_name(domain_id)
+                        if not self.env.context.get('print_mode') or not self.env.context.get('no_format'):
+                            name = name[:40] + '...' if name and len(name) >= 45 else name
+                        vals = {
+                            'id': domain_id,
+                            'name': name,
+                            'level': line.level,
+                            'parent_id': line.id,
+                            'columns': [{'name': l} for l in res[domain_id]],
+                            'caret_options': groupby == 'account_id' and 'account.account' or groupby,
+                            'financial_group_line_id': line.id,
+                        }
+                        if line.financial_report_id.name == 'Aged Receivable':
+                            vals['trust'] = self.env['res.partner'].browse([domain_id]).trust
+                        lines.append(vals)
+                ##############################################################################
+
                 if domain_ids and self.env.company.totals_below_sections:
                     lines.append({
                         'id': 'total_' + str(line.id),
@@ -151,3 +172,25 @@ class account_custom_balance_in_group_0(models.Model):
             gb = self.env[relation].browse(gb_id)
             return gb.display_name if gb and gb.exists() else _('Undefined')
         return gb_id
+
+
+
+class account_financial_html_report_custom(models.Model):
+    
+    _inherit = 'account.financial.html.report'
+
+    group_account_type_filter = fields.Boolean('Group by account type')
+    
+    def _get_options(self, options):
+        if(options != False and options.get("group_account_type", False)):
+            self.filter_group_account_type = options['group_account_type']
+        else:
+            self.filter_group_account_type = False
+        to_return = super(account_financial_html_report_custom, self)._get_options(options)
+        return to_return
+
+class AccountReportCustom(models.AbstractModel):
+    
+    _inherit = 'account.report'
+
+    filter_group_account_type = None
