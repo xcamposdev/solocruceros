@@ -50,7 +50,8 @@
             <script type="text/javascript" src="/web/static/src/js/services/local_storage_service.js"></script>
             <!-- Bus, Mail, Livechat -->
                 <!-- thread windows -->
-                <script type="text/javascript" src="/mail/static/src/js/thread_windows/abstract_thread_window.js"></script>
+                <!-- <script type="text/javascript" src="/mail/static/src/js/thread_windows/abstract_thread_window.js"></script> -->
+                <script type="text/javascript" src="/im_livechat_custom_web/static/src/js/chat_custom.js"></script>
                 <script type="text/javascript" src="/im_livechat/static/src/js/website_livechat_window.js"></script>
                 <script type="text/javascript" src="/mail/static/src/js/thread_widget.js"></script>
 

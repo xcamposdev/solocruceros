@@ -8,16 +8,17 @@ import copy
 from odoo import http
 from odoo.http import request
 from odoo import exceptions
+from odoo.tools import OrderedSet
 
 _logger = logging.getLogger(__name__)
 
 class scApiInvoiceManagement(http.Controller):
 
     # @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
-    @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
+    @http.route('/api/solocruceros-invoice-register', auth='public', type='json', methods=['POST'], csrf=False)
     def sc_api_invoice(self):
         try:
-            #request.session.authenticate('Andres_Test', 'acastillo@develoop.net', 'Temp1243')
+            request.session.authenticate('Andres_Test', 'acastillo@develoop.net', 'Temp1243')
             #INICIALIZACION
             self.ID_LOG = 0
             self.INTENTS = 0
@@ -65,24 +66,26 @@ class scApiInvoiceManagement(http.Controller):
 
 
     def process_data(self, data):
+        ctx = (request.context.copy())
+        ctx.update(check_move_validity=False)
+        request.context = ctx
+
         reserve_number = data.get('reserve_number', False)
         confirmation_date = self.get_datetime(data.get('confirmationDate')) if data.get('confirmationDate', False) else False
         partner_id = request.env['res.partner'].search([('id','=',data.get('partner_id'))]).id if data.get('partner_id', False) else False
-        
+        journal_id = request.env['account.journal'].search([('type','=?','sale')], limit=1)
+
         account_move = request.env['account.move'].create({
             'partner_id': partner_id,
             'ref': reserve_number,
             'invoice_date': confirmation_date,
+            'journal_id':journal_id.id,
             'type':'out_invoice'
         })
         account_move._onchange_partner_id()
         
         for line in data['invoice_lines']:
-            account = request.env['account.account'].search([('code','=',line['account_id'])])
-
-            ctx = (request.context.copy())
-            ctx.update(check_move_validity=False)
-            request.context = ctx
+            account = request.env['account.account'].search([('id','=',line['account_id'])])
 
             account_move_line = request.env['account.move.line'].create({
                 'move_id': account_move.id,
@@ -93,12 +96,21 @@ class scApiInvoiceManagement(http.Controller):
                 'price_unit': line['price'],
                 'exclude_from_invoice_tab':False
             })
+            
             account_move_line._onchange_product_id()
+            
             account_move_line.name = line['label']
             account_move_line.account_id = account.id
             account_move_line.quantity = line['quantity']
             account_move_line.price_unit = line['price']
-
+            
+            account_move_line._onchange_price_subtotal()
+            account_move_line._onchange_uom_id()
+            account_move_line._onchange_mark_recompute_taxes()
+            account_move_line._onchange_credit()
+            account_move_line._onchange_mark_recompute_taxes()
+        
+        account_move._onchange_invoice_line_ids()
         account_move.action_post()
 
         return account_move
@@ -107,9 +119,9 @@ class scApiInvoiceManagement(http.Controller):
 
     def get_datetime(self, date):
         if(date):
-            yyyy = int(date[0: 4])
-            mm = int(date[4: 6])
-            dd = int(date[6: 8])
+            dd = int(date[0: 2])
+            mm = int(date[3: 5])
+            yyyy = int(date[6: 10])
             _datetime = datetime.date(yyyy, mm, dd)
             return _datetime
         else:
