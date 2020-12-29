@@ -4,7 +4,7 @@
 
     <template id="report_margin_product_custom" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">
-            <script type="text/javascript" src="/sc_api_invoice_management/static/src/js/chat_custom.js"></script>
+            <script type="text/javascript" src="/im_livechat_custom_web/static/src/js/chat_custom.js"></script>
         </xpath>
     </template>
 
