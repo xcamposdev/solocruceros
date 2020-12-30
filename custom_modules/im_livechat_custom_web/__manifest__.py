@@ -13,9 +13,6 @@
     'data': [
         'views/im_livechat_template_custom.xml',
     ],
-    'qweb': [
-        "views/im_livechat_x_custom.xml",
-    ],
     'demo': [],
     'installable': True,
 }
