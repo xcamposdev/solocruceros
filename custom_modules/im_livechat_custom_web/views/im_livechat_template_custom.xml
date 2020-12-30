@@ -62,7 +62,7 @@
 
             <script type="text/javascript" src="/mail/static/src/js/utils.js"></script>
             <script type="text/javascript" src="/mail/static/src/js/document_viewer.js"></script>
-            <script type="text/javascript" src="/im_livechat/static/src/js/im_livechat.js"></script>
+            <script type="text/javascript" src="/im_livechat_custom_web/static/src/js/im_livechat.js"></script>
             <!-- Models -->
                     <!-- threads -->
                     <script type="text/javascript" src="/mail/static/src/js/models/threads/abstract_thread.js"></script>
