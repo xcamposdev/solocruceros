@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<template xml:space="preserve">
-    <t t-extend="mail.AbstractThreadWindow.HeaderContent" >
-        <t t-jquery="span.o_thread_window_buttons" t-operation="replace">
-            <span class="o_thread_window_close fa fa-close"></span>
-        </t>
-    </t>
-</template>
