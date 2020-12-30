@@ -291,6 +291,7 @@ odoo.define('mail.AbstractThreadWindow', function (require) {
             var options = this._getHeaderRenderingOptions();
             this.$header.html(
                 QWeb.render('mail.AbstractThreadWindow.HeaderContent', options));
+            this.$header[0].innerHTML = this.$header[0].innerHTML.replace('<a href="#" class="o_thread_window_close fa fa-close"></a>','<span class="o_thread_window_close fa fa-close"></span>');
         },
         /**
          * Scroll to the bottom of the thread in the thread window
