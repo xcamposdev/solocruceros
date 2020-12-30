@@ -11,7 +11,6 @@
         """,
     'depends': ['im_livechat', 'mail'],
     'data': [
-        #'views/assets.xml',
         'views/im_livechat_template_custom.xml',
     ],
     'qweb': [
