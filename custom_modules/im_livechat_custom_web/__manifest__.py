@@ -9,10 +9,13 @@
     'description': """
         - Se modifica carga de librerias para que pueda integrarse con solo cruceros
         """,
-    'depends': ['im_livechat'],
+    'depends': ['im_livechat', 'mail'],
     'data': [
-        'views/assets.xml',
+        #'views/assets.xml',
         'views/im_livechat_template_custom.xml',
+    ],
+    'qweb': [
+        "views/im_livechat_x_custom.xml",
     ],
     'demo': [],
     'installable': True,
