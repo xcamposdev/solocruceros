@@ -63,9 +63,6 @@ class crm_custom_auto_assignment(models.Model):
                 list_id.append(self.sudo().partner_id.id)            
                 self.message_subscribe(partner_ids=list_id)
 
-                # update last asign
-                self.env['ir.config_parameter'].sudo().set_param('x_agent_logged_in_key', self.user_id)
-
                 # Notify to current user
                 self.user_id.notify_info(message='Se ha agregado una nueva oportunidad y ha sido asignada a ti.', sticky=True, record_id=self.id)
             
@@ -75,7 +72,7 @@ class crm_custom_auto_assignment(models.Model):
             if ['type', '=', 'opportunity'] in args:
                 stage_id = list(_arg[2] for _arg in args if _arg[0] == "stage_id" and len(_arg) == 3)
                 if(stage_id):
-                    stage = self.env['crm.stage'].search([('id','=',stage_id)])
+                    stage = self.env['crm.stage'].search([('id','=',stage_id[0])])
                     if(stage.name == 'Nuevo'):
                         order = 'date_open desc'
 
