@@ -6,6 +6,9 @@ odoo.define("web_notify.WebClient", function(require) {
     var Dialog = require('web.Dialog');
     require("bus.BusService");
 
+    // properties
+    _audio: null,
+
     WebClient.include({
         show_application: function() {
             var res = this._super();
@@ -53,9 +56,8 @@ odoo.define("web_notify.WebClient", function(require) {
                 message: message.message,
                 sticky: message.sticky,
                 className: message.className,
-
-                
             }); */
+            var self =this;
             var dialog = new Dialog(this, {
                 title: 'Información',
                 size: 'medium',
@@ -63,10 +65,39 @@ odoo.define("web_notify.WebClient", function(require) {
                 buttons: [{
                     text: ('Ok'),
                     classes: "btn-primary",
-                    close: true
+                    close: true,
+                    click: function () {
+                        //location.reload();
+                        self._rpc({
+                            model: "ir.model.data",
+                            method: 'get_object_reference',
+                            args: ['crm', 'crm_lead_view_form']
+                        }).then(function (result) {
+                            self.do_action({
+                                name: "flujo",
+                                type: 'ir.actions.act_window',
+                                res_model: 'crm.lead',
+                                views: [[result[1], 'form']],
+                                view_mode: 'form',
+                                res_id: message.record_id
+                            });
+                        });
+                    },
                 }],
             }).open();
+            this._beep();
 
         },
+        _beep: function() {
+            if (typeof(Audio) !== "undefined") {
+                if (!this._audio) {
+                    this._audio = new Audio();
+                    var ext = this._audio.canPlayType("audio/ogg; codecs=vorbis") ? ".ogg" : ".mp3";
+                    var session = this.getSession();
+                    this._audio.src = session.url("/mail/static/src/audio/ting" + ext);
+                }
+                Promise.resolve(this._audio.play()).catch(_.noop);
+            }
+        }
     });
 });

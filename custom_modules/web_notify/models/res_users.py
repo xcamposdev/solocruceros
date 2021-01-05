@@ -32,28 +32,28 @@ class ResUsers(models.Model):
     notify_info_channel_name = fields.Char(compute="_compute_channel_names")
     notify_default_channel_name = fields.Char(compute="_compute_channel_names")
 
-    def notify_success(self, message="Default message", title=None, sticky=False):
+    def notify_success(self, message="Default message", title=None, sticky=False, record_id=False):
         title = title or _("Success")
-        self._notify_channel(SUCCESS, message, title, sticky)
+        self._notify_channel(SUCCESS, message, title, sticky, record_id)
 
-    def notify_danger(self, message="Default message", title=None, sticky=False):
+    def notify_danger(self, message="Default message", title=None, sticky=False, record_id=False):
         title = title or _("Danger")
-        self._notify_channel(DANGER, message, title, sticky)
+        self._notify_channel(DANGER, message, title, sticky, record_id)
 
-    def notify_warning(self, message="Default message", title=None, sticky=False):
+    def notify_warning(self, message="Default message", title=None, sticky=False, record_id=False):
         title = title or _("Warning")
-        self._notify_channel(WARNING, message, title, sticky)
+        self._notify_channel(WARNING, message, title, sticky, record_id)
 
-    def notify_info(self, message="Default message", title=None, sticky=False):
+    def notify_info(self, message="Default message", title=None, sticky=False, record_id=False):
         title = title or _("Information")
-        self._notify_channel(INFO, message, title, sticky)
+        self._notify_channel(INFO, message, title, sticky, record_id)
 
-    def notify_default(self, message="Default message", title=None, sticky=False):
+    def notify_default(self, message="Default message", title=None, sticky=False, record_id=False):
         title = title or _("Default")
-        self._notify_channel(DEFAULT, message, title, sticky)
+        self._notify_channel(DEFAULT, message, title, sticky, record_id)
 
     def _notify_channel(
-        self, type_message=DEFAULT, message=DEFAULT_MESSAGE, title=None, sticky=False
+        self, type_message=DEFAULT, message=DEFAULT_MESSAGE, title=None, sticky=False, record_id=False
     ):
         # pylint: disable=protected-access
         # if not self.env.user._is_admin() and any(
@@ -68,6 +68,7 @@ class ResUsers(models.Model):
             "message": message,
             "title": title,
             "sticky": sticky,
+            "record_id": record_id
         }
         notifications = [(record[channel_name_field], bus_message) for record in self]
         self.env["bus.bus"].sendmany(notifications)
