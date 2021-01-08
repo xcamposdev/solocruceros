@@ -99,7 +99,7 @@ class account_custom_balance_in_group_0(models.Model):
                             'name': name,
                             'level': line.level,
                             'parent_id': line.id,
-                            'columns': [{'name': account_group['price']},{'name': 0}],
+                            'columns': [{'name': account_group['price']}],
                             'caret_options': groupby == 'account_id' and 'account.account' or groupby,
                             'financial_group_line_id': line.id,
                             'custom_group': True,
