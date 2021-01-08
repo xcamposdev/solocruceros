@@ -252,9 +252,12 @@ odoo.define('im_livechat.im_livechat', function (require) {
                         data: livechatData
                     });
                     return self._openChatWindow().then(function () {
-                        if (!self._history) {
+                
+                       /* if (!self._history) {
                             self._sendWelcomeMessage();
-                        }
+                        }*/
+                        self._sendWelcomeMessage();
+                        
                         self._renderMessages();
                         self.call('bus_service', 'addChannel', self._livechat.getUUID());
                         self.call('bus_service', 'startPolling');
@@ -568,4 +571,3 @@ odoo.define('im_livechat.im_livechat', function (require) {
     };
     
     });
-    

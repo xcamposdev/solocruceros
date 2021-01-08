@@ -76,7 +76,7 @@ class account_custom_balance_in_group_0(models.Model):
                 
                 ##############################################################################
                 if options.get('group_account_type', False) == True:
-                    accounts = self.env['account.account'].search([('id','=',domain_ids)])
+                    accounts = self.env['account.account'].search([('id','in',domain_ids)])
                     account_groups = []
                     for account in accounts:
                         exist_group = list(filter(lambda f:f['group_id'] == account.group_id.id, account_groups))
@@ -108,8 +108,6 @@ class account_custom_balance_in_group_0(models.Model):
                             vals['trust'] = self.env['res.partner'].browse([account_group['group_id']]).trust
                         lines.append(vals)
                 else:
-                    if line.groupby:
-                        domain_ids = sorted(list(domain_ids), key=lambda k: line._get_gb_name(k))
                     for domain_id in domain_ids:
                         name = line._get_gb_name(domain_id)
                         if not self.env.context.get('print_mode') or not self.env.context.get('no_format'):

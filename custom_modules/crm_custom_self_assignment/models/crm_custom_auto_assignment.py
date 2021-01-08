@@ -19,47 +19,60 @@ class crm_custom_auto_assignment(models.Model):
         return self.env.user.id
 
     def Custom_Assign_Agent_logged(self):
-        # Get parameter
-        agent_logged = self.env['ir.config_parameter'].sudo().get_param('x_agent_logged_in_key')
+        if not self.user_id:
+            # Get parameter
+            agent_logged = self.env['ir.config_parameter'].sudo().get_param('x_agent_logged_in_key')
 
-        next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', agent_logged),('last_check_out','=',False),('last_check_in', '!=', False), ('x_oportunity_notification', '=', 'si')], order="id asc", limit=1)
-        if(next_employee.id == False):
-            self.env['ir.config_parameter'].sudo().set_param('x_agent_logged_in_key', 0)
-            next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', 0),('last_check_out','=',False),('last_check_in', '!=', False), ('x_oportunity_notification', '=', 'si')], order="id asc", limit=1)
-        
-        if(next_employee.id != False):
-            # select * From hr_attendance
-            # eliminar el comercial de seguidores
-
+            next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', agent_logged),('last_check_out','=',False),('last_check_in', '!=', False), ('x_oportunity_notification', '=', 'si')], order="id asc", limit=1)
+            if(next_employee.id == False):
+                self.env['ir.config_parameter'].sudo().set_param('x_agent_logged_in_key', 0)
+                next_employee = self.env['hr.employee'].sudo().search(['&',('id','>', 0),('last_check_out','=',False),('last_check_in', '!=', False), ('x_oportunity_notification', '=', 'si')], order="id asc", limit=1)
             
-            # asignar comercial a seguidores
-            #self.message_subscribe(next_employee.user_partner_id.ids, [])
+            if(next_employee.id != False):
+                # select * From hr_attendance
+                # eliminar el comercial de seguidores
+                
+                # asignar comercial a seguidores
+                #self.message_subscribe(next_employee.user_partner_id.ids, [])
+                
+                self.action = "exist" #'create','exist','nothing' 
+                self.user_id = next_employee.user_id
+                self.action_apply()
+                
+                for follower in self.sudo().message_follower_ids:
+                    if(follower.partner_id != self.sudo().user_id.partner_id and self.partner_id != follower.partner_id):
+                        follower.unlink()
+
+                # assign new client follower
+                list_id = []
+                list_id.append(self.sudo().partner_id.id)            
+                self.message_subscribe(partner_ids=list_id)
+
+                # update last asign
+                self.env['ir.config_parameter'].sudo().set_param('x_agent_logged_in_key', next_employee.id)
+
+                # Notify to current user
+                next_employee.user_id.notify_info(message='Se ha agregado una nueva oportunidad y ha sido asignada a ti.', sticky=True, record_id=self.id)
+        else: 
+                for follower in self.sudo().message_follower_ids:
+                    if(follower.partner_id != self.sudo().user_id.partner_id and self.partner_id != follower.partner_id):
+                        follower.unlink()
+
+                # assign new client follower
+                list_id = []
+                list_id.append(self.sudo().partner_id.id)            
+                self.message_subscribe(partner_ids=list_id)
+
+                # Notify to current user
+                self.user_id.notify_info(message='Se ha agregado una nueva oportunidad y ha sido asignada a ti.', sticky=True, record_id=self.id)
             
-            self.action = "exist" #'create','exist','nothing' 
-            self.user_id = next_employee.user_id
-            self.action_apply()
-            
-            for follower in self.sudo().message_follower_ids:
-                if(follower.partner_id != self.sudo().user_id.partner_id and self.partner_id != follower.partner_id):
-                    follower.unlink()
-
-            # assign new client follower
-            list_id = []
-            list_id.append(self.sudo().partner_id.id)            
-            self.message_subscribe(partner_ids=list_id)
-
-            # update last asign
-            self.env['ir.config_parameter'].sudo().set_param('x_agent_logged_in_key', next_employee.id)
-
-            # Notify to current user
-            next_employee.user_id.notify_info(message='Se ha agregado una nueva oportunidad y ha sido asignada a ti.', sticky=True)
 
     def search(self, args, offset=0, limit=None, order=None, count=False):
         if args:
             if ['type', '=', 'opportunity'] in args:
                 stage_id = list(_arg[2] for _arg in args if _arg[0] == "stage_id" and len(_arg) == 3)
                 if(stage_id):
-                    stage = self.env['crm.stage'].search([('id','=',stage_id)])
+                    stage = self.env['crm.stage'].search([('id','=',stage_id[0])])
                     if(stage.name == 'Nuevo'):
                         order = 'date_open desc'
 
