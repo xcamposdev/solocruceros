@@ -99,7 +99,7 @@ class account_custom_balance_in_group_0(models.Model):
                             'name': name,
                             'level': line.level,
                             'parent_id': line.id,
-                            'columns': [{'name': account_group['price']}],
+                            'columns': [{'name': account_group['price']},{'name': 0}],
                             'caret_options': groupby == 'account_id' and 'account.account' or groupby,
                             'financial_group_line_id': line.id,
                             'custom_group': True,
@@ -108,8 +108,6 @@ class account_custom_balance_in_group_0(models.Model):
                             vals['trust'] = self.env['res.partner'].browse([account_group['group_id']]).trust
                         lines.append(vals)
                 else:
-                    if line.groupby:
-                        domain_ids = sorted(list(domain_ids), key=lambda k: line._get_gb_name(k))
                     for domain_id in domain_ids:
                         name = line._get_gb_name(domain_id)
                         if not self.env.context.get('print_mode') or not self.env.context.get('no_format'):
