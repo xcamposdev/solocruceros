@@ -76,7 +76,7 @@ class account_custom_balance_in_group_0(models.Model):
                 
                 ##############################################################################
                 if options.get('group_account_type', False) == True:
-                    accounts = self.env['account.account'].search([('id','=',domain_ids)])
+                    accounts = self.env['account.account'].search([('id','in',domain_ids)])
                     account_groups = []
                     for account in accounts:
                         exist_group = list(filter(lambda f:f['group_id'] == account.group_id.id, account_groups))
