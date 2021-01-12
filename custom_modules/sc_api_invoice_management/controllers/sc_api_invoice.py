@@ -13,11 +13,11 @@ _logger = logging.getLogger(__name__)
 
 class scApiInvoiceManagement(http.Controller):
 
-    # @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
-    @http.route('/api/solocruceros-invoice-register', auth='public', type='json', methods=['POST'], csrf=False)
+    @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
+    #@http.route('/api/solocruceros-invoice-register', auth='public', type='json', methods=['POST'], csrf=False)
     def sc_api_invoice(self):
         try:
-            request.session.authenticate('Andres_Test', 'acastillo@develoop.net', 'Temp1243')
+            #request.session.authenticate('Andres_Test', 'acastillo@develoop.net', 'Temp1243')
 
             body_data = json.loads(request.httprequest.data)
             _logger.info(body_data)
@@ -33,6 +33,7 @@ class scApiInvoiceManagement(http.Controller):
             return { 'status_code':200, 'invoice_id': account_id, 'message':'success' }
         except Exception as e:
             _logger.info(str(e))
+            request.cr.rollback()
             #cr.rollback() # error, rollback everything atomically
             return { 'status_code':500, 'message':'Error de tipo ' + str(e) }
         #finally:
@@ -68,10 +69,10 @@ class scApiInvoiceManagement(http.Controller):
                 # elif not request.env['account.journal'].search([('bank_account_id.acc_number','=',data['payment_list'][index]['diario_de_pago'])]):
                 #     msg += 'No se encontro el diario de pago con Id: ' + str(data['payment_list'][index]['diario_de_pago']) + '\r\n'
                     
-                if not data['payment_list'][index].get('monto_pagado', 0) == 0:
+                if data['payment_list'][index].get('monto_pagado', True) == True:
                     msg += 'Linea pago: ' + str(index) + ': Falta el valor de: monto_pagado \r\n'
 
-                if not data['payment_list'][index].get('fecha_pago', False):
+                if data['payment_list'][index].get('fecha_pago', True) == True:
                     msg += 'Linea pago: ' + str(index) + ': Falta el valor de: fecha_pago \r\n'
 
         if(msg != ''):
@@ -85,10 +86,13 @@ class scApiInvoiceManagement(http.Controller):
         account_move = False
         if not data.get('odoo_invoice_id', False):
             account_move = self.create_account(data)
-        # else:
-        #     account_move = self.create_rectification(data)
+            return account_move.id
+        else:
+            self.create_rectification(data)
+            account_move = self.create_account(data)
+            return account_move.id
 
-        return account_move.id
+        
 
     def create_account(self, data):
         reserve_number = data.get('reserve_number', False)
@@ -151,7 +155,8 @@ class scApiInvoiceManagement(http.Controller):
                 
                 journal_find = list(_data for _data in journal_process if _data['code'] == payment['diario_de_pago'])
                 
-                payment = request.env['account.payment'].create({
+                payment = request.env['account.payment'].with_context(active_ids=account_move.ids, active_model='account.move', active_id=account_move.id) \
+                    .create({
                     'amount': payment['monto_pagado'],
                     'communication': account_move.name,
                     'currency_id': currency.id,
@@ -159,7 +164,10 @@ class scApiInvoiceManagement(http.Controller):
                     'partner_id': account_move.partner_id.id,
                     'partner_type': 'customer',
                     'payment_date': date_pay,
-                    'payment_difference_handling': ("reconcile" if (account_move.amount_residual == payment['monto_pagado']) else "open"),
+                    #'invoice_ids': [(0, 0, account_move.ids )],
+                    #ERROR:  inserción o actualización en la tabla «account_invoice_payment_rel» viola la llave foránea «account_invoice_payment_rel_invoice_id_fkey»
+                    # DETAIL:  La llave (invoice_id)=(0) no está presente en la tabla «account_move».\n'
+                    #'payment_difference_handling': ("reconcile" if (account_move.amount_residual == payment['monto_pagado']) else "open"),
                     'hide_payment_method': True,
                     'payment_method_id': payment_method_code.id,
                     'payment_method_code': 'manual',
@@ -170,7 +178,12 @@ class scApiInvoiceManagement(http.Controller):
         return account_move
 
     def create_rectification(self, data):
-        test = ""
+        move = request.env['account.move'].search([('id','=',data.get('odoo_invoice_id'))])
+
+        default_values_list = []
+        default_values_list.append(self._prepare_default_reversal(move))
+        new_moves = move._reverse_moves(default_values_list, cancel=True)
+        
 
     def get_datetime(self, date):
         if(date):
@@ -181,3 +194,15 @@ class scApiInvoiceManagement(http.Controller):
             return _datetime
         else:
             return ""
+
+    def _prepare_default_reversal(self, move):
+            return {
+            'ref': 'Reversión de: %s' % (move.name),
+            'date': datetime.date.today(),
+            'invoice_date': move.date,
+            'journal_id': move.journal_id.id,
+            'invoice_payment_term_id': None,
+            'auto_post': False,
+            'invoice_user_id': move.invoice_user_id.id,
+        }
+  
