@@ -13,11 +13,11 @@ _logger = logging.getLogger(__name__)
 
 class scApiInvoiceManagement(http.Controller):
 
-    # @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
-    @http.route('/api/solocruceros-invoice-register', auth='public', type='json', methods=['POST'], csrf=False)
+    @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
+    #@http.route('/api/solocruceros-invoice-register', auth='public', type='json', methods=['POST'], csrf=False)
     def sc_api_invoice(self):
         try:
-            request.session.authenticate('Andres_Test', 'acastillo@develoop.net', 'Temp1243')
+            #request.session.authenticate('Andres_Test', 'acastillo@develoop.net', 'Temp1243')
 
             body_data = json.loads(request.httprequest.data)
             _logger.info(body_data)
@@ -165,8 +165,8 @@ class scApiInvoiceManagement(http.Controller):
                     'partner_type': 'customer',
                     'payment_date': date_pay,
                     #'invoice_ids': [(0, 0, account_move.ids )],
-                    #ERROR:  inserción o actualización en la tabla «account_invoice_payment_rel» viola la llave foránea «account_invoice_payment_rel_invoice_id_fkey»
-                    # DETAIL:  La llave (invoice_id)=(0) no está presente en la tabla «account_move».\n'
+                    #ERROR:  inserciÃ³n o actualizaciÃ³n en la tabla Â«account_invoice_payment_relÂ» viola la llave forÃ¡nea Â«account_invoice_payment_rel_invoice_id_fkeyÂ»
+                    # DETAIL:  La llave (invoice_id)=(0) no estÃ¡ presente en la tabla Â«account_moveÂ».\n'
                     #'payment_difference_handling': ("reconcile" if (account_move.amount_residual == payment['monto_pagado']) else "open"),
                     'hide_payment_method': True,
                     'payment_method_id': payment_method_code.id,
@@ -197,7 +197,7 @@ class scApiInvoiceManagement(http.Controller):
 
     def _prepare_default_reversal(self, move):
             return {
-            'ref': 'Reversión de: %s' % (move.name),
+            'ref': 'ReversiÃ³n de: %s' % (move.name),
             'date': datetime.date.today(),
             'invoice_date': move.date,
             'journal_id': move.journal_id.id,
