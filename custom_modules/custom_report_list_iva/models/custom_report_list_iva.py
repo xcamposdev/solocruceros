@@ -55,13 +55,14 @@ class custom_report_list_iva(models.Model):
                             a_m.partner_id as x_invoice_partner_id,
                             r_p.vat as x_invoice_dni_nif,
                             a_m.fiscal_position_id as x_invoice_fiscal_position_id,
-                            a_m_l.price_subtotal as x_invoice_amount_untaxes,
+                            CASE WHEN a_m.reversed_entry_id IS NULL THEN a_m_l.price_subtotal ELSE a_m_l.price_subtotal*-1 END as x_invoice_amount_untaxes,
                             --(SELECT name FROM account_tax WHERE id in (array_to_string(array_remove(ARRAY_AGG(a_m_l_tax.account_tax_id), NULL),','))) x_invoice_tax_ids,
                             --array_remove(ARRAY_AGG(a_m_l_tax.account_tax_id), NULL)::int[] x_invoice_tax_ids,
                             array_to_string(ARRAY_AGG(a_t.name),'; ') x_invoice_tax_ids,
                             sum(a_t.amount) x_invoice_taxes_percent,
-                            (a_m_l.price_subtotal * sum(a_t.amount) / 100) x_invoice_taxes_value,
-                            a_m_l.price_total as x_invoice_amount_total
+                            CASE WHEN a_m.reversed_entry_id IS NULL THEN (a_m_l.price_subtotal * sum(a_t.amount) / 100) ELSE (a_m_l.price_subtotal * sum(a_t.amount) / 100)*-1 END  x_invoice_taxes_value,
+                            CASE WHEN a_m.reversed_entry_id IS NULL THEN a_m_l.price_total ELSE a_m_l.price_total*-1 END as x_invoice_amount_total
+                            --a_m_l.price_total as x_invoice_amount_total
 
                         FROM account_move a_m INNER JOIN account_move_line a_m_l ON a_m.id = a_m_l.move_id
                                     INNER JOIN res_partner r_p ON a_m.partner_id = r_p.id

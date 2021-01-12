@@ -12,10 +12,10 @@
                     <field name="x_invoice_partner_id" />
                     <field name="x_invoice_dni_nif" />
                     <field name="x_invoice_fiscal_position_id" />
-                    <field name="x_invoice_amount_untaxes" />
+                    <field name="x_invoice_amount_untaxes" sum="Total"/>
                     <field name="x_invoice_tax_ids" />
-                    <field name="x_invoice_taxes_value" />
-                    <field name="x_invoice_amount_total"  />
+                    <field name="x_invoice_taxes_value" sum="Total"/>
+                    <field name="x_invoice_amount_total" sum="Total"/>
                 </tree>
             </field>
         </record>
@@ -37,7 +37,7 @@
         <menuitem 
             id="x_listado_iva_menu_report"
             name="Listado de IVA"
-            parent="account.menu_action_account_invoice_report_all"
+            parent="account.account_reports_management_menu"
             action="action_iva_report_list"
             sequence="1"/>
 
