@@ -14,7 +14,7 @@
         'views/crm_custom_hide.xml',
     ],
     'images': ['static/description/icon.png'],
-    'demo': [],
+    'demo': [], 
     'installable': True,
     'application': True,
     'auto_install': False,
