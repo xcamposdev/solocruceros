@@ -47,10 +47,10 @@
                                     <span class="text-nowrap small" t-field="o.x_invoice_amount_untaxes"></span>
                                 </td>
                                 <td class="text-right">
-                                    <span class="text-nowrap small" t-field="o.x_invoice_tax_ids"></span>
+                                    <span class="text-nowrap small" t-field="o.x_tax_name"></span>
                                 </td>
                                 <td class="text-right">
-                                    <span class="text-nowrap small" t-field="o.x_invoice_taxes_value"></span>
+                                    <span class="text-nowrap small" t-field="o.x_tax_value"></span>
                                 </td>
                                 <td class="text-right">
                                     <span class="text-nowrap small" t-field="o.x_invoice_amount_total"></span>
