@@ -6,19 +6,40 @@
             <field name="model">report.list.iva.custom</field>
             <field eval="16" name="priority"/>
             <field name="arch" type="xml">
-                <tree create="false">
+                <tree create="false" decoration-info="x_state == 'draft'" decoration-muted="x_state == 'cancel'">
                     <field name="x_invoice_number" />
+                    <field name="x_state" invisible="1" />
                     <field name="x_invoice_date" />
                     <field name="x_invoice_partner_id" />
                     <field name="x_invoice_dni_nif" />
                     <field name="x_invoice_fiscal_position_id" />
                     <field name="x_invoice_amount_untaxes" sum="Total"/>
-                    <field name="x_invoice_tax_ids" />
-                    <field name="x_invoice_taxes_value" sum="Total"/>
+                    <field name="x_tax_name" />
+                    <field name="x_tax_value" sum="Total"/>
                     <field name="x_invoice_amount_total" sum="Total"/>
                 </tree>
             </field>
         </record>
+
+        <record id="iva_report_search_list" model="ir.ui.view">
+            <field name="name">iva_report_list.search</field>
+            <field name="model">report.list.iva.custom</field>
+            <field name="arch" type="xml">
+                <search string="Listado de IVA">
+                    <filter name="x_type" string="Asiento contable" domain="[('x_type','=','entry')]"/>
+                    <filter name="x_type" string="Factura Cliente" domain="[('x_type','=','out_invoice')]"/>
+                    <filter name="x_type" string="Factura Rectificativa Cliente" domain="[('x_type','=','out_refund')]"/>
+                    <filter name="x_type" string="Factura Proveedor" domain="[('x_type','=','in_invoice')]"/>
+                    <filter name="x_type" string="Factura Rectificativa Proveedor" domain="[('x_type','=','in_refund')]"/>
+                    <filter name="x_type" string="Recibo de ventas" domain="[('x_type','=','out_receipt')]"/>
+                    <filter name="x_type" string="Recibo de compra" domain="[('x_type','=','in_receipt')]"/>
+                    <group expand="1" string="Group By">
+                        <filter string="Tipo de Factura" name="x_type" context="{'group_by': 'x_type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
 
         <record id="action_iva_report_list" model="ir.actions.act_window">
             <field name="name">Listado de IVA</field>
