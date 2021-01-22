@@ -65,6 +65,28 @@ class custom_report_list_iva(models.Model):
                                 INNER JOIN account_tax a_t ON a_t.id=a_m_l.tax_line_id
 
                 WHERE a_m_l.tax_line_id is not null
+                UNION
+                SELECT 
+                    row_number() over (order by a_m.id desc) as id,
+                    a_m.currency_id as x_currency_id,
+                    a_m.name as x_invoice_number,
+                    a_m.type as x_type,
+                    a_m.state as x_state,
+                    a_m.invoice_date as x_invoice_date,
+                    a_m.partner_id as x_invoice_partner_id,
+                    r_p.vat as x_invoice_dni_nif,
+                    a_m.fiscal_position_id as x_invoice_fiscal_position_id,
+                    CASE WHEN a_m.type = 'out_refund' OR a_m.type = 'in_refund' THEN a_m_l.price_subtotal*-1 ELSE a_m_l.price_subtotal END as x_invoice_amount_untaxes,
+                    a_t.name as x_tax_name,
+                    a_t.amount as  x_taxes_percent,
+                    0 as x_tax_value,
+                    a_m.amount_total_signed as x_invoice_amount_total
+
+                FROM account_move a_m INNER JOIN account_move_line a_m_l ON a_m.id = a_m_l.move_id
+                        INNER JOIN res_partner r_p ON a_m.partner_id = r_p.id
+                        INNER JOIN account_move_line_account_tax_rel aml_at ON a_m_l.id=aml_at.account_move_line_id
+                        INNER JOIN account_tax a_t ON a_t.id=aml_at.account_tax_id
+                WHERE a_t.amount=0
             )
         ''' % (
             self._table,
