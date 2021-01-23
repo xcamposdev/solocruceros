@@ -45,7 +45,7 @@ class custom_report_list_iva(models.Model):
         self.env.cr.execute('''
             CREATE OR REPLACE VIEW %s AS (
                 SELECT 
-                    row_number() over (order by a_m.id desc) as id,
+                    a_m_l.id as id,
                     a_m.currency_id as x_currency_id,
                     a_m.name as x_invoice_number,
                     a_m.type as x_type,
@@ -67,7 +67,7 @@ class custom_report_list_iva(models.Model):
                 WHERE a_m_l.tax_line_id is not null
                 UNION
                 SELECT 
-                    row_number() over (order by a_m.id desc) as id,
+                    a_m_l.id as id,
                     a_m.currency_id as x_currency_id,
                     a_m.name as x_invoice_number,
                     a_m.type as x_type,
