@@ -11,6 +11,10 @@
                         </div>
                     </div>
 
+                    <t t-set="amount_untaxes" t-value="0"/>
+                    <t t-set="amount_tax" t-value="0"/>
+                    <t t-set="amount_total" t-value="0"/>
+                    <t t-set="currency_id" t-value="1" />
                     <table class="table table-sm o_main_table" name="invoice_line_table">
                     <thead>
                         <tr>
@@ -20,13 +24,17 @@
                             <th name="th_nif" class="text-left"><span class="small o_bold">DNI/NIF</span></th>
                             <th name="th_fiscal_position" class="text-left"><span class="small o_bold">Posición fiscal</span></th>
                             <th name="th_tax_exclude" class="text-right"><span class="small o_bold">Impuesto no incluido</span></th>
-                            <th name="th_tax_percent" class="text-right"><span class="small o_bold">% Impuesto</span></th>
+                            <th name="th_tax_percent" class="text-left"><span class="small o_bold">% Impuesto</span></th>
                             <th name="th_total_tax" class="text-right"><span class="small o_bold">Total Impuesto</span></th>
                             <th name="th_total_invoice" class="text-right"><span class="small o_bold">Total factura</span></th>
                         </tr>
                     </thead>
                     <tbody class="list_iva_tbody">
                         <t t-foreach="docs" t-as="o">
+                            <t t-set="amount_untaxes" t-value="amount_untaxes + o.x_invoice_amount_untaxes"/>
+                            <t t-set="amount_tax" t-value="amount_tax + o.x_tax_value"/>
+                            <t t-set="amount_total" t-value="amount_total + o.x_invoice_amount_total"/>
+                            <t t-set="currency_id" t-value="o.x_currency_id" />
                             <tr>
                                 <td class="text-left">
                                     <span class="small" t-field="o.x_invoice_number"></span>
@@ -46,7 +54,7 @@
                                 <td class="text-right">
                                     <span class="text-nowrap small" t-field="o.x_invoice_amount_untaxes"></span>
                                 </td>
-                                <td class="text-right">
+                                <td class="text-left">
                                     <span class="text-nowrap small" t-field="o.x_tax_name"></span>
                                 </td>
                                 <td class="text-right">
@@ -59,6 +67,34 @@
                         </t>
                     </tbody>
                     </table>
+
+                    <div class="clearfix">
+                        <div id="total" class="row">
+                            <div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+                                    <tr class="border-black o_subtotal" style="">
+                                        <td><strong>Impuesto no incluido</strong></td>
+                                        <td class="text-right">
+                                            <span t-esc="amount_untaxes" t-options="{'widget': 'monetary', 'display_currency': currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black o_subtotal" style="">
+                                        <td><strong>Total Impuesto</strong></td>
+                                        <td class="text-right">
+                                            <span t-esc="amount_tax" t-options="{'widget': 'monetary', 'display_currency': currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black o_total">
+                                        <td><strong>Total factura</strong></td>
+                                        <td class="text-right">
+                                            <span t-esc="amount_total" t-options="{'widget': 'monetary', 'display_currency': currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>    
             </t>
         </t>
