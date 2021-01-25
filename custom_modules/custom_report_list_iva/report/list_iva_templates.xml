@@ -24,7 +24,7 @@
                             <th name="th_nif" class="text-left"><span class="small o_bold">DNI/NIF</span></th>
                             <th name="th_fiscal_position" class="text-left"><span class="small o_bold">Posición fiscal</span></th>
                             <th name="th_tax_exclude" class="text-right"><span class="small o_bold">Impuesto no incluido</span></th>
-                            <th name="th_tax_percent" class="text-right"><span class="small o_bold">% Impuesto</span></th>
+                            <th name="th_tax_percent" class="text-left"><span class="small o_bold">% Impuesto</span></th>
                             <th name="th_total_tax" class="text-right"><span class="small o_bold">Total Impuesto</span></th>
                             <th name="th_total_invoice" class="text-right"><span class="small o_bold">Total factura</span></th>
                         </tr>
