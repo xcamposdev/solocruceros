@@ -13,11 +13,6 @@ _logger = logging.getLogger(__name__)
 
 class scApiInvoiceManagement(http.Controller):
 
-    OPERATION_CREATE = 'create'
-    OPERATION_ADDPAY = 'addPay'
-    OPERATION_OVERRIDE = 'override'
-    
-
     # @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
     @http.route('/api/solocruceros-invoice-register', auth='public', type='json', methods=['POST'], csrf=False)
     def sc_api_invoice(self):
@@ -27,67 +22,65 @@ class scApiInvoiceManagement(http.Controller):
             body_data = json.loads(request.httprequest.data)
             _logger.info(body_data)
 
-            if body_data.get('type', False):
-                if body_data.get('type') == self.OPERATION_CREATE or body_data.get('type') == self.OPERATION_OVERRIDE:
-                    return self.create_or_override(body_data)
+            #self.validation(body_data)
 
-                if body_data.get('type') == self.OPERATION_ADDPAY:
-                    return self.addpay(body_data)
-            else:
-                raise exceptions.UserError("No se identificó el tipo de operación")
-            
+            #db, pool = pooler.get_db_and_pool(db_name)
+            # create transaction cursor
+            #cr = db.cursor()
+            account_id = self.process_invoice(body_data)
+            #cr.commit() # all good, we commit
+
+            return { 'status_code':200, 'invoice_id': account_id, 'message':'success' }
         except Exception as e:
             _logger.info(str(e))
             request.cr.rollback()
+            #cr.rollback() # error, rollback everything atomically
             return { 'status_code':500, 'message':'Error de tipo ' + str(e) }
+        #finally:
+            #cr.close() # always close cursor opened manually 481
 
+    def process_invoice(self, data):
+        
+        ctx = (request.context.copy())
+        ctx.update(check_move_validity=False)
+        request.context = ctx
 
-
-    def validate_invoice(self, data):
-        msg = ""
-
-        # Validate for Account Move
-        if data.get('type') == self.OPERATION_OVERRIDE:
-            if not data.get('odoo_invoice_id', False):
-                msg += 'Falta el valor de: odoo_invoice_id \r\n'
-            elif not request.env['account.move'].search([('id','=',data.get('odoo_invoice_id'))]):
-                msg += 'No se encontro la factura con Id: ' + str(data.get('odoo_invoice_id')) + '\r\n'
-
-        msg += '' if data.get('partner_id', False) else 'Falta el valor de: partner_id \r\n'
-        msg += '' if data.get('reserve_number', False) else 'Falta el valor de: reserve_number \r\n'
-    
-        # Validate for Account Move Line
-        for index in range(len(data.get('invoice_lines', []))):
-            
-            if not data['invoice_lines'][index].get('product_id', False):
-                msg += 'Linea: ' + str(index) + ': Falta el valor de: product_id \r\n'
-            elif not request.env['product.template'].search([('id','=',data['invoice_lines'][index]['product_id'])]):
-                msg += 'No se encontro el producto con Id: ' + str(data['invoice_lines'][index]['product_id']) + '\r\n'
-            if not data['invoice_lines'][index].get('account_id', False):
-                msg += 'Linea: ' + str(index) + ': Falta el valor de: account_id \r\n'
-            elif not request.env['account.account'].search([('id','=',data['invoice_lines'][index]['account_id'])]):
-                msg += 'No se encontro la cuenta con Id: ' + str(data['invoice_lines'][index]['account_id']) + '\r\n'
-
-            msg += '' if data['invoice_lines'][index]['label'] else 'Linea: ' + str(index) + ': Falta el valor de: label \r\n'
-            msg += '' if data['invoice_lines'][index]['quantity'] else 'Linea: ' + str(index) + ': Falta el valor de: quantity \r\n'
-            msg += '' if data['invoice_lines'][index]['price'] else 'Linea: ' + str(index) + ': Falta el valor de: price \r\n'
-            
-        # Validate for Payments
-        if data.get('odoo_invoice_id', False) and data.get('payment_list', False):
-            msg += self.validate_payment(data)
-        return msg
-    
-    def validate_payment(self, data):
-        msg = ""
+        account_move = False
         if not data.get('odoo_invoice_id', False):
-            msg += 'Falta el valor de: odoo_invoice_id \r\n'
-        elif not request.env['account.move'].search([('name','=',data.get('odoo_invoice_id'))]):
-            msg += 'No se encontro la factura con Id: ' + str(data.get('odoo_invoice_id')) + '\r\n'
+            account_move = self.create_account(data)
+            return account_move.name
+        else:
+            self.create_rectification(data)
+            account_move = self.create_account(data)
+            return account_move.name
 
-        if msg == '':
+
+    def validation(self, data):
+        msg = ""
+        if(data):
+            msg = msg + ('' if data.get('partner_id', False) else 'Falta el valor de: partner_id \r\n')
+            msg = msg + ('' if data.get('reserve_number', False) else 'Falta el valor de: reserve_number \r\n')
+            
+            for index in range(len(data.get('invoice_lines', []))):
+                
+                if not data['invoice_lines'][index].get('product_id', False):
+                    msg += 'Linea: ' + str(index) + ': Falta el valor de: product_id \r\n'
+                elif not request.env['product.template'].search([('id','=',data['invoice_lines'][index]['product_id'])]):
+                    msg += 'No se encontro el producto con Id: ' + str(data['invoice_lines'][index]['product_id']) + '\r\n'
+                if not data['invoice_lines'][index].get('account_id', False):
+                    msg += 'Linea: ' + str(index) + ': Falta el valor de: account_id \r\n'
+                elif not request.env['account.account'].search([('id','=',data['invoice_lines'][index]['account_id'])]):
+                    msg += 'No se encontro la cuenta con Id: ' + str(data['invoice_lines'][index]['account_id']) + '\r\n'
+
+                msg = msg + ('' if data['invoice_lines'][index]['label'] else 'Linea: ' + str(index) + ': Falta el valor de: label \r\n')
+                msg = msg + ('' if data['invoice_lines'][index]['quantity'] else 'Linea: ' + str(index) + ': Falta el valor de: quantity \r\n')
+                msg = msg + ('' if data['invoice_lines'][index]['price'] else 'Linea: ' + str(index) + ': Falta el valor de: price \r\n')
+
+        if data.get('odoo_invoice_id', False) and data.get('payment_list', False):
+            
             journals = self.get_all_journal()
             for index in range(len(data.get('payment_list', []))):
-                    
+                
                 if not data['payment_list'][index].get('diario_de_pago', False):
                     msg += 'Linea pago: ' + str(index) + ': Falta el valor de: diario_de_pago \r\n'
                 else:
@@ -100,42 +93,9 @@ class scApiInvoiceManagement(http.Controller):
 
                 if data['payment_list'][index].get('fecha_pago', True) == True:
                     msg += 'Linea pago: ' + str(index) + ': Falta el valor de: fecha_pago \r\n'
-        return msg
 
-
-
-    def create_or_override(self, data):
-        
-        error_text = self.validate_invoice(data)
-        if error_text != '':
-            raise exceptions.UserError("Faltan los siguientes datos \r\n" +  error_text)
-        
-        ctx = (request.context.copy())
-        ctx.update(check_move_validity=False)
-        request.context = ctx
-
-        #response = requests.post(url+"/api/hotel", data=json.dumps(paramaters), headers={'Content-type': 'application/json'}, timeout=60)#timeout en segundos
-        if not data.get('odoo_invoice_id', False):
-            to_return = self.create_account(data)
-            return { 'status_code':200, 'invoice_id': json.dumps(to_return), 'message':'success' }
-        else:
-            self.create_rectification(data)
-            to_return = self.create_account(data)
-            return { 'status_code':200, 'invoice_id': json.dumps(to_return), 'message':'success' }
-        
-    def addpay(self, data):
-        
-        error_text = self.validate_payment(data)
-        if error_text != '':
-            raise exceptions.UserError("Faltan los siguientes datos \r\n" +  error_text)
-        
-        payments = self.create_payment(data)
-        to_return = {
-            'invoice': data.get('odoo_invoice_id'),
-            'payments': payments,
-        }
-
-        return { 'status_code':200, 'invoice_id': json.dumps(to_return), 'message':'success' }
+        if(msg != ''):
+            raise exceptions.UserError("Faltan los siguientes datos \r\n" +  msg)
 
 
 
@@ -186,26 +146,7 @@ class scApiInvoiceManagement(http.Controller):
         account_move.action_post()
 
         # Crea sus pagos
-        payments = self.create_payment(data)
-        to_return = {
-            'invoice': account_move.name,
-            'payments': payments,
-        }
-
-        return to_return
-
-    def create_rectification(self, data):
-        move = request.env['account.move'].search([('name','=',data.get('odoo_invoice_id'))])
-
-        default_values_list = []
-        default_values_list.append(self._prepare_default_reversal(move))
-        new_moves = move._reverse_moves(default_values_list, cancel=True)
-
-    def create_payment(self, data):
-         # Crea sus pagos
-        id_return = []
         if data.get('payment_list', False):
-            account_move = request.env['account.move'].search([('name','=',data.get('odoo_invoice_id'))])
             currency = request.env['res.currency'].search([('name', '=', 'EUR')])
             payment_method_code = request.env['account.payment.method'].search([('code','=','manual'),('payment_type','=','inbound')])
 
@@ -216,7 +157,7 @@ class scApiInvoiceManagement(http.Controller):
                 
                 journal_find = list(_data for _data in journals if _data['code'] == payment['diario_de_pago'])
                 
-                _payment = request.env['account.payment'].with_context(active_ids=account_move.ids, active_model='account.move', active_id=account_move.id) \
+                payment = request.env['account.payment'].with_context(active_ids=account_move.ids, active_model='account.move', active_id=account_move.id) \
                     .create({
                     'amount': payment['monto_pagado'],
                     'communication': account_move.name,
@@ -230,10 +171,18 @@ class scApiInvoiceManagement(http.Controller):
                     'payment_method_code': 'manual',
                     'payment_type': 'inbound',
                 })
-                _payment.post()
-                id_return.append({ 'soloId': payment['soloId'], 'odooId': _payment.id })
+                
+                payment.post()
                     
-        return id_return
+        return account_move
+
+    def create_rectification(self, data):
+        move = request.env['account.move'].search([('name','=',data.get('odoo_invoice_id'))])
+
+        default_values_list = []
+        default_values_list.append(self._prepare_default_reversal(move))
+        new_moves = move._reverse_moves(default_values_list, cancel=True)
+        
 
 
     def get_datetime(self, date):
@@ -247,7 +196,7 @@ class scApiInvoiceManagement(http.Controller):
             return ""
 
     def _prepare_default_reversal(self, move):
-        return {
+            return {
             'ref': 'Reversión de: %s' % (move.name),
             'date': datetime.date.today(),
             'invoice_date': move.date,

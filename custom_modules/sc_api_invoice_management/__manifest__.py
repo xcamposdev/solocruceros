@@ -10,7 +10,9 @@
     'description': """
         Account api invoice custom
         """,
-    'data': [],
+    "data": [
+        'views/parameters.xml',
+    ],
     'images': ['static/description/icon.png'],
     'demo': [],
     'installable': True,
