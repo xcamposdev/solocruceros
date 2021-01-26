@@ -18,11 +18,9 @@ class scApiInvoiceManagement(http.Controller):
     OPERATION_OVERRIDE = 'override'
     
 
-    # @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
-    @http.route('/api/solocruceros-invoice-register', auth='public', type='json', methods=['POST'], csrf=False)
+    @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
     def sc_api_invoice(self):
         try:
-            request.session.authenticate('Andres_Test', 'acastillo@develoop.net', 'Temp1243')
 
             body_data = json.loads(request.httprequest.data)
             _logger.info(body_data)
