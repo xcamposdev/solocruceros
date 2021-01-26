@@ -50,7 +50,7 @@ class scApiInvoiceManagement(http.Controller):
         if data.get('type') == self.OPERATION_OVERRIDE:
             if not data.get('odoo_invoice_id', False):
                 msg += 'Falta el valor de: odoo_invoice_id \r\n'
-            elif not request.env['account.move'].search([('id','=',data.get('odoo_invoice_id'))]):
+            elif not request.env['account.move'].search([('name','=',data.get('odoo_invoice_id'))]):
                 msg += 'No se encontro la factura con Id: ' + str(data.get('odoo_invoice_id')) + '\r\n'
 
         msg += '' if data.get('partner_id', False) else 'Falta el valor de: partner_id \r\n'
@@ -68,9 +68,9 @@ class scApiInvoiceManagement(http.Controller):
             elif not request.env['account.account'].search([('id','=',data['invoice_lines'][index]['account_id'])]):
                 msg += 'No se encontro la cuenta con Id: ' + str(data['invoice_lines'][index]['account_id']) + '\r\n'
 
-            msg += '' if data['invoice_lines'][index]['label'] else 'Linea: ' + str(index) + ': Falta el valor de: label \r\n'
-            msg += '' if data['invoice_lines'][index]['quantity'] else 'Linea: ' + str(index) + ': Falta el valor de: quantity \r\n'
-            msg += '' if data['invoice_lines'][index]['price'] else 'Linea: ' + str(index) + ': Falta el valor de: price \r\n'
+            msg += '' if data['invoice_lines'][index].get('label', False) else 'Linea: ' + str(index) + ': Falta el valor de: label \r\n'
+            msg += '' if data['invoice_lines'][index].get('quantity', False) else 'Linea: ' + str(index) + ': Falta el valor de: quantity \r\n'
+            #msg += '' if data['invoice_lines'][index].get('price', False) or data['invoice_lines'][index].get('price', False) == 0 else 'Linea: ' + str(index) + ': Falta el valor de: price \r\n'
             
         # Validate for Payments
         if data.get('odoo_invoice_id', False) and data.get('payment_list', False):
@@ -114,13 +114,13 @@ class scApiInvoiceManagement(http.Controller):
         ctx.update(check_move_validity=False)
         request.context = ctx
 
-        #response = requests.post(url+"/api/hotel", data=json.dumps(paramaters), headers={'Content-type': 'application/json'}, timeout=60)#timeout en segundos
-        if not data.get('odoo_invoice_id', False):
+        if data.get('type', False) == self.OPERATION_CREATE:
             to_return = self.create_account(data)
+            _logger.info(json.dumps(to_return))
             return { 'status_code':200, 'invoice_id': json.dumps(to_return), 'message':'success' }
-        else:
-            self.create_rectification(data)
-            to_return = self.create_account(data)
+        elif data.get('type', False) == self.OPERATION_OVERRIDE:
+            to_return = self.create_rectification(data)
+            _logger.info(json.dumps(to_return))
             return { 'status_code':200, 'invoice_id': json.dumps(to_return), 'message':'success' }
         
     def addpay(self, data):
@@ -134,7 +134,8 @@ class scApiInvoiceManagement(http.Controller):
             'invoice': data.get('odoo_invoice_id'),
             'payments': payments,
         }
-
+        
+        _logger.info(json.dumps(to_return))
         return { 'status_code':200, 'invoice_id': json.dumps(to_return), 'message':'success' }
 
 
@@ -160,12 +161,14 @@ class scApiInvoiceManagement(http.Controller):
 
         #crea su detalle
         for line in data['invoice_lines']:
+
             account_move_line = request.env['account.move.line'].create({
                 'move_id': account_move.id,
                 'product_id': line['product_id'],
                 'name': line['label'],
                 'account_id': line['account_id'],
                 'quantity': line['quantity'],
+                #'tax_ids': tax_id.ids,
                 'price_unit': line['price'],
                 'exclude_from_invoice_tab': False
             })
@@ -176,14 +179,12 @@ class scApiInvoiceManagement(http.Controller):
             account_move_line.price_unit = line['price']
             
             account_move_line._onchange_price_subtotal()
-            account_move_line._onchange_uom_id()
-            account_move_line.price_unit = line['price']
-            account_move_line._onchange_mark_recompute_taxes()
             account_move_line._onchange_credit()
             account_move_line._onchange_mark_recompute_taxes()
             
         account_move._onchange_invoice_line_ids()
         account_move.action_post()
+        data['odoo_invoice_id'] = account_move.name
 
         # Crea sus pagos
         payments = self.create_payment(data)
@@ -196,10 +197,57 @@ class scApiInvoiceManagement(http.Controller):
 
     def create_rectification(self, data):
         move = request.env['account.move'].search([('name','=',data.get('odoo_invoice_id'))])
+        payments = request.env['account.payment'].search([('invoice_ids','in',move.id)])
 
         default_values_list = []
         default_values_list.append(self._prepare_default_reversal(move))
         new_moves = move._reverse_moves(default_values_list, cancel=True)
+
+        to_return = self.create_account(data)
+
+        # Asignar pagos
+        # for payment in payments:
+        #     payment.invoice_ids = [(6, 0, [new_moves.id])]
+        #     (new_moves[0] + payment.invoice_ids).line_ids.filtered(lambda line: not line.reconciled and line.account_id == payment.destination_account_id).reconcile()
+        move_new = request.env['account.move'].search([('name','=',to_return.get('invoice'))])
+        pay_term_line_ids = move_new.line_ids.filtered(lambda line: line.account_id.user_type_id.type in ('receivable', 'payable'))
+        
+        domain = [('account_id', 'in', pay_term_line_ids.mapped('account_id').ids),
+                    '|', ('move_id.state', '=', 'posted'), '&', ('move_id.state', '=', 'draft'), ('journal_id.post_at', '=', 'bank_rec'),
+                    ('partner_id', '=', move_new.commercial_partner_id.id),
+                    ('reconciled', '=', False), '|', ('amount_residual', '!=', 0.0),
+                    ('amount_residual_currency', '!=', 0.0)]
+        if move_new.is_inbound():
+            domain.extend([('credit', '>', 0), ('debit', '=', 0)])
+        else:
+            domain.extend([('credit', '=', 0), ('debit', '>', 0)])
+        
+        lines = request.env['account.move.line'].search(domain)
+        for _line in lines:
+            lines = request.env['account.move.line'].browse(_line.id)
+            lines += move_new.line_ids.filtered(lambda line: line.account_id == lines[0].account_id and not line.reconciled)
+            lines.reconcile()
+
+
+        #scApiInvoiceManagement' object has no attribute 'line_ids'
+        # if move_new.invoice_ids:
+        #     (moves[0] + rec.invoice_ids).line_ids \
+        #                 .filtered(lambda line: not line.reconciled and line.account_id == rec.destination_account_id)\
+        #                 .reconcile()
+
+        # for payment in payments:
+        #     payment.invoice_ids = [(6, 0, [move_new.id])]
+
+        # #1
+        # if rec.invoice_ids:
+        #     (moves[0] + rec.invoice_ids).line_ids.filtered(lambda line: not line.reconciled and line.account_id == rec.destination_account_id).reconcile()
+        # #2
+        # lines = self.env['account.move.line'].browse(line_id)
+        # lines += self.line_ids.filtered(lambda line: line.account_id == lines[0].account_id and not line.reconciled)
+        # return lines.reconcile()
+
+
+        return to_return
 
     def create_payment(self, data):
          # Crea sus pagos
