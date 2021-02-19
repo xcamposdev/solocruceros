@@ -21,7 +21,6 @@ class scApiInvoiceManagement(http.Controller):
     @http.route('/api/solocruceros-invoice-register', auth='user', type='json', methods=['POST'], csrf=False)
     def sc_api_invoice(self):
         try:
-
             body_data = json.loads(request.httprequest.data)
             _logger.info(body_data)
 
@@ -315,6 +314,7 @@ class scApiInvoiceManagement(http.Controller):
     def check_client_account_receivable(self, partner_id, reserve_number):
         account_client = request.env['ir.config_parameter'].sudo().get_param('x_default_client_account_receivable')
 
+        reserve_number = reserve_number.replace("-", "")
         if partner_id.property_account_receivable_id.code == account_client:
             account_default = request.env['account.account'].search([('code','=',account_client)])
             zero = 12 - len(reserve_number) - len("430")
