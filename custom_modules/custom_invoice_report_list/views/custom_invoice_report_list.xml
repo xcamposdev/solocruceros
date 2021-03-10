@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="invoice_report_view_list" model="ir.ui.view">
+            <field name="name">invoice_report_list.view</field>
+            <field name="model">account.invoice.report</field>
+            <field eval="16" name="priority"/>
+            <field name="arch" type="xml">
+                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'">
+                    <field name="partner_id" string="Cliente"/>
+                    <field name="invoice_date"/>
+                    <field name="name" string="Número" />
+                    <field name="invoice_user_id"/>
+                    <field name="invoice_date_due"/>
+                    <field name="currency_id" invisible="1" />
+                    <field name="x_amount_untaxed_signed" sum="Total" />
+                    <field name="x_amount_tax_signed" sum="Total" />
+                    <field name="x_amount_total_signed" sum="Total" />
+                    <field name="x_residual_signed" sum="Total" />
+                    <field name="state" string="Estado"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_partner_tree_view1" model="ir.actions.act_window.view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="invoice_report_view_list"/>
+            <field name="act_window_id" ref="account.action_account_invoice_report_all"/>
+        </record>
+
+        <record id="account.action_account_invoice_report_all" model="ir.actions.act_window">
+            <field name="name">Invoices Analysis</field>
+            <field name="res_model">account.invoice.report</field>
+            <field name="view_mode">graph,pivot,tree</field>
+            <field name="context">{'search_default_current':1, 'search_default_customer':1, 'group_by':[], 'group_by_no_leaf':1, 'search_default_year': 1}</field>
+            <field name="search_view_id" ref="account.view_account_invoice_report_search"/>
+            <field name="help">From this report, you can have an overview of the amount invoiced to your customers. The search tool can also be used to personalise your Invoices reports and so, match this analysis to your needs.</field>
+        </record>
+
+    </data>
+</odoo>
+
