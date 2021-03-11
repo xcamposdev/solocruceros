@@ -1,0 +1,12 @@
+<odoo>
+
+  <data noupdate="1">
+
+    <record id="x_default_client_account_receivable" model="ir.config_parameter">
+        <field name="key">x_default_client_account_receivable</field>
+        <field name="value">430000000000</field>
+    </record>
+   
+  </data>
+
+</odoo>

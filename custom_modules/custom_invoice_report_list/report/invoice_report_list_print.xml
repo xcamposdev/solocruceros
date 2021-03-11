@@ -1,0 +1,10 @@
+<odoo>
+    <report id="print_invoice_report"
+        	string="Listado de Factura"
+        	model="account.invoice.report"
+        	report_type="qweb-pdf"
+        	name="custom_invoice_report_list.print_invoice_report_pdf"
+        	file="custom_invoice_report_list.print_invoice_report_pdf"
+        	menu="True"
+			print_report_name="'Listado de Facturas'"/>
+</odoo>

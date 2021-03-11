@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="print_invoice_report_pdf">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="row">
+                        <div class="col h2 text-center" style="margin-bottom:20px;">
+                            <span>Listado de Factura</span>
+                        </div>
+                    </div>
+
+                    <t t-set="price_total" t-value="0"/>
+                    <t t-set="tax_total" t-value="0"/>
+                    <t t-set="amount_total" t-value="0"/>
+                    <t t-set="currency_id" t-value="1"/>
+                    <table class="table table-sm o_main_table" name="invoice_line_table">
+                        <thead>
+                            <tr>
+                                <th name="th_client_name" class="text-left"><span class="small o_bold">Cliente</span></th>
+                                <th name="th_date_invoice" class="text-left"><span class="small o_bold">Fecha factura</span></th>
+                                <th name="th_number_invoice" class="text-left"><span class="small o_bold">Número</span></th>
+                                <th name="th_user_id" class="text-left"><span class="small o_bold">Comercial</span></th>
+                                <th name="th_due_date" class="text-left"><span class="small o_bold">Fecha vencimiento</span></th>
+                                <th name="th_price_total" class="text-right"><span class="small o_bold">Impuesto no incluido</span></th>
+                                <th name="th_amount_tax" class="text-right"><span class="small o_bold">Impuesto</span></th>
+                                <th name="th_amount_total" class="text-right"><span class="small o_bold">Total</span></th>
+                                <th name="th_user_currency_residual" class="text-right"><span class="small o_bold">Importe adeudado</span></th>
+                                <th name="th_state" class="text-right"><span class="small o_bold">Estado</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="list_iva_tbody" style="border-bottom:2px solid #000000;">
+                            <t t-foreach="docs" t-as="o">
+                                <t t-set="price_total" t-value="price_total + o.x_amount_untaxed_signed"/>
+                                <t t-set="tax_total" t-value="tax_total + o.x_amount_tax_signed"/>
+                                <t t-set="amount_total" t-value="amount_total + o.x_amount_total_signed"/>
+                                <t t-set="currency_id" t-value="o.currency_id" />
+                                <tr>
+                                    <td class="text-left">
+                                        <span class="small" t-field="o.partner_id"></span>
+                                    </td>
+                                    <td class="text-left">
+                                        <span class="small" t-field="o.invoice_date"></span>
+                                    </td>  
+                                    <td class="text-left">
+                                        <span class="small" t-field="o.name"></span>
+                                    </td>                                                                      
+                                    <td class="text-left">
+                                        <span class="small" t-field="o.invoice_user_id"></span>
+                                    </td>
+                                    <td class="text-left">
+                                        <span class="text-nowrap small" t-field="o.invoice_date_due"></span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="text-nowrap small" t-field="o.x_amount_untaxed_signed"  t-options="{'widget': 'monetary', 'display_currency': currency_id}"></span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="text-nowrap small" t-field="o.x_amount_tax_signed"  t-options="{'widget': 'monetary', 'display_currency': currency_id}"></span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="text-nowrap small" t-field="o.x_amount_total_signed" t-options="{'widget': 'monetary', 'display_currency': currency_id}"></span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="text-nowrap small" t-field="o.x_residual_signed"  t-options="{'widget': 'monetary', 'display_currency': currency_id}"></span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="text-nowrap small" t-field="o.state"></span>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                     <div class="clearfix">
+                        <div id="total" class="row">
+                            <div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+                                    <tr class="border-black o_subtotal" style="">
+                                        <td><strong>Impuesto no incluido</strong></td>
+                                        <td class="text-right">
+                                            <span t-esc="price_total" t-options="{'widget': 'monetary', 'display_currency': currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black o_subtotal" style="">
+                                        <td><strong>Total Impuesto</strong></td>
+                                        <td class="text-right">
+                                            <span t-esc="tax_total" t-options="{'widget': 'monetary', 'display_currency': currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black o_total">
+                                        <td><strong>Total factura</strong></td>
+                                        <td class="text-right">
+                                            <span t-esc="amount_total" t-options="{'widget': 'monetary', 'display_currency': currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+            </t>
+        </t>
+    </template>
+
+</odoo>
