@@ -5,7 +5,7 @@
     'author': 'Develoop Software S.A.',
     'category': 'menu',
     'website': 'https://www.develoop.net/',
-    'depends': ['base','account','account_accountant','l10n_es_aeat','account_payment_order','account_asset_management'],
+    'depends': ['base','account','account_accountant','l10n_es_aeat','account_payment_order'],
     'summary': 'Unir menu Contabilidad AEAT',
     'description': """
         Unir menu Contabilidad AEAT
