@@ -27,3 +27,8 @@
 	path = BADEP/addons
 	url = git@github.com:BADEP/addons.git
 	branch = 13.0
+
+[submodule "OCA/mis-builder"]
+	path = OCA/mis-builder
+	url = git@github.com:OCA/mis-builder.git
+	branch = 13.0
