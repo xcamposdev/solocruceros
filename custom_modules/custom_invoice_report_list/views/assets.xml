@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE xml>
+<odoo>
+
+    <template id="custom_invoice_report_list" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/custom_invoice_report_list/static/src/js/data_export_custom.js"></script>
+        </xpath>
+    </template>
+
+</odoo>
