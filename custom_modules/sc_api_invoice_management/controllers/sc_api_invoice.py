@@ -150,7 +150,8 @@ class scApiInvoiceManagement(http.Controller):
         account_move = request.env['account.move'].create({
             'partner_id': partner_id.id,
             'ref': reserve_number,
-            'invoice_date': confirmation_date,
+            'date': datetime.date.today(), #confirmation_date,
+            'invoice_date': datetime.date.today(), #confirmation_date,
             'journal_id': journal_id.id,
             'type': 'out_invoice'
         })
