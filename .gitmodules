@@ -22,3 +22,18 @@
 	path = OCA/bank-payment
 	url = git@github.com:OCA/bank-payment.git
 	branch = 13.0
+
+[submodule "BADEP/addons"]
+	path = BADEP/addons
+	url = git@github.com:BADEP/addons.git
+	branch = 13.0
+
+[submodule "OCA/mis-builder"]
+	path = OCA/mis-builder
+	url = git@github.com:OCA/mis-builder.git
+	branch = 13.0
+
+[submodule "OCA/account-financial-tools"]
+	path = OCA/account-financial-tools
+	url = git@github.com:OCA/account-financial-tools.git
+	branch = 13.0
