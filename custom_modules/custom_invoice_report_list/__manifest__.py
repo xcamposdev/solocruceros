@@ -11,10 +11,11 @@
         """,
     'depends': ['base','account'],
     'data': [
+        'security/ir.model.access.csv',
+        'views/assets.xml',
         'views/custom_invoice_report_list.xml',
         'report/invoice_report_list_print.xml',
         'report/invoice_list_template.xml',
-
     ],
     'qweb': [],
     'demo': [],

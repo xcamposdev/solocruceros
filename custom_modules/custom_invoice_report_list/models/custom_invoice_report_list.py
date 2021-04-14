@@ -21,3 +21,32 @@ class InvoiceReportListCustom(models.Model):
             invoice.x_amount_tax_signed = invoice.move_id.amount_tax
             invoice.x_amount_total_signed = invoice.move_id.amount_total_signed
             invoice.x_residual_signed = invoice.move_id.amount_residual_signed
+
+
+    @api.model
+    def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None):
+        #data2 = super().search_read(domain=domain, fields=fields, offset=offset, limit=limit, order=order)
+        if self._context.get('from_action', False) and self._context.get('from_action') == 'custom':
+            # if self._context.get('params', False) == False or \
+            #     (self._context.get('params',False) and self._context.get('params').get('view_type',False) and self._context.get('params').get('view_type') == 'list'):
+            data = self.env['account.invoice.report2'].sudo().search_read(domain=domain, fields=fields, offset=offset, limit=limit, order=order)
+            toreturn = []
+            for record in data:
+                new_data = {
+                    'id': record.get('id', False),
+                    'partner_id': record.get('partner_id', False),
+                    'invoice_date': record.get('invoice_date',False),
+                    'name': record.get('name',False),
+                    'invoice_user_id': record.get('invoice_user_id',False),
+                    'invoice_date_due': record.get('invoice_date_due',False),
+                    'currency_id': record.get('currency_id',False),
+                    'state': record.get('state',False),
+                    'x_amount_untaxed_signed': record.get('x_amount_untaxed_signed',False),
+                    'x_amount_tax_signed': record.get('x_amount_tax_signed',False),
+                    'x_amount_total_signed': record.get('x_amount_total_signed',False),
+                    'x_residual_signed': record.get('x_residual_signed',False),
+                }
+                toreturn.append(new_data)
+            return toreturn
+        else:        
+            return super().search_read(domain=domain, fields=fields, offset=offset, limit=limit, order=order)

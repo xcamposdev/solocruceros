@@ -4,7 +4,6 @@
         <record id="invoice_report_view_list" model="ir.ui.view">
             <field name="name">invoice_report_list.view</field>
             <field name="model">account.invoice.report</field>
-            <field eval="16" name="priority"/>
             <field name="arch" type="xml">
                 <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'">
                     <field name="partner_id" string="Cliente"/>
@@ -33,7 +32,7 @@
             <field name="name">Invoices Analysis</field>
             <field name="res_model">account.invoice.report</field>
             <field name="view_mode">graph,pivot,tree</field>
-            <field name="context">{'search_default_current':1, 'search_default_customer':1, 'group_by':[], 'group_by_no_leaf':1, 'search_default_year': 1}</field>
+            <field name="context">{'search_default_current':1, 'search_default_customer':1, 'group_by':[], 'group_by_no_leaf':1, 'search_default_year': 1,'from_action':'custom'}</field>
             <field name="search_view_id" ref="account.view_account_invoice_report_search"/>
             <field name="help">From this report, you can have an overview of the amount invoiced to your customers. The search tool can also be used to personalise your Invoices reports and so, match this analysis to your needs.</field>
         </record>
