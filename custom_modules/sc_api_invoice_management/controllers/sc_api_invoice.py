@@ -181,7 +181,7 @@ class scApiInvoiceManagement(http.Controller):
             account_move_line._onchange_mark_recompute_taxes()
             
         account_move._onchange_invoice_line_ids()
-        #account_move.action_post()
+        account_move.action_post()
         data['odoo_invoice_id'] = account_move.name
 
         # Crea sus pagos
