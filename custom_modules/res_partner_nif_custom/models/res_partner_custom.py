@@ -21,7 +21,7 @@ class res_partner_custom(models.Model):
                 vat_country, vat_number = self._split_vat(values['vat'])
                 if code and code.lower() != vat_country:
                     values['vat'] = str(code) + str(values['vat'])
-                return super(res_partner_custom, self).create(values)            
+            return super(res_partner_custom, self).create(values)            
         except Exception as e:
             _logger.info("Error al formatear nif {}".format(e))
             values['vat'] = vat
