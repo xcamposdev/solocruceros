@@ -9,7 +9,7 @@
     'description': """
         Añade un campo para DNI, Pasaporte o NIE
     """,
-    'depends': ['base'],
+    'depends': ['base','base_vat'],
     'data': [
         'views/res_partner_custom.xml',
     ],
