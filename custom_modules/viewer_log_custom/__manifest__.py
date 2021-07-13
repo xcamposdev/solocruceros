@@ -9,7 +9,7 @@
     'description': """
         Ver errores en log custom
         """,
-    'depends': ['reporting-engine'],
+    'depends': ['l10n_es_vat_book'],
     'data': [
         'views/sale_order_views.xml',
     ],
