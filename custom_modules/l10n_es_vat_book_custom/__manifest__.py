@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Ver errores en log Custom",
+    'name': "Libro Iva Correccion Errores Custom",
     'version': '0.1',
     'author': "Develoop Software",
     'category': 'Uncategorized',
-    'summary': 'Ver errores en log custom',
+    'summary': 'Libro Iva Correccion Errores Custom',
     'website': "https://www.develoop.net/",
     'description': """
-        Ver errores en log custom
+        Libro Iva Correccion Errores Custom
         """,
     'depends': ['l10n_es_vat_book'],
     'data': [
