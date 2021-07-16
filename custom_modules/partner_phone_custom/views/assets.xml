@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE xml>
+<odoo>
+    <template id="pivot_custom" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/partner_phone_custom/static/src/js/phone_custom.js"></script>
+        </xpath>
+    </template>
+</odoo>
